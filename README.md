@@ -6,12 +6,25 @@ Temporary placeholder website for the DV-Deeplink project.
 
 This is a simple HTML placeholder page displaying the "Work in Progress" status for the DV-Deeplink application - Demonstrating Deeplinking for Digital Virgo Applications.
 
+## Build Process
+
+For CI/CD pipelines that require a build step:
+
+```bash
+npm install
+npm run build
+```
+
+This creates a `dist/` folder containing the static files ready for deployment.
+
 ## Deployment
 
-This website requires no build process or dependencies. Simply upload the following files to any web server:
+You can deploy this website with or without the build process. Simply upload the following files to any web server:
 
 - `index.html` (main page)
 - `public/` folder (contains the Work in Progress image)
+
+Or deploy the contents of the `dist/` folder after running `npm run build`.
 
 ### Deployment Options
 
