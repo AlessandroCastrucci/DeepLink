@@ -1,0 +1,17 @@
+{
+  "name": "dv-deeplink",
+  "version": "1.0.0",
+  "description": "DV-Deeplink - Static work in progress page demonstrating deeplinking",
+  "scripts": {
+    "build": "copyfiles -u 0 index.html dist && copyfiles -u 0 \"public/**/*\" dist"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1"
+  },
+  "keywords": [
+    "deeplink",
+    "static"
+  ],
+  "author": "",
+  "license": "ISC"
+}
