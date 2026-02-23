@@ -1,17 +1,32 @@
 {
   "name": "dv-deeplink",
+  "private": true,
   "version": "1.0.0",
-  "description": "DV-Deeplink - Static work in progress page demonstrating deeplinking",
+  "type": "module",
+  "description": "DV-Deeplink - Video catalog webapp with deep linking bridge for native apps",
   "scripts": {
-    "build": "copyfiles -u 0 index.html dist && copyfiles -u 0 \"public/**/*\" dist"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.6.1"
   },
   "devDependencies": {
-    "copyfiles": "^2.4.1"
+    "@tailwindcss/vite": "^4.1.7",
+    "@types/node": "^25.3.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "tailwindcss": "^4.1.7",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
   },
   "keywords": [
     "deeplink",
-    "static"
-  ],
-  "author": "",
-  "license": "ISC"
+    "catalog",
+    "vod"
+  ]
 }

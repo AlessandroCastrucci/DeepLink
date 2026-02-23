@@ -1,0 +1,41 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "TEAM_ID.com.playvod.ios"
+        ],
+        "components": [
+          {
+            "/": "/content/*",
+            "comment": "Content detail pages open in the native app"
+          },
+          {
+            "/": "/category/*",
+            "comment": "Category pages open in the native app"
+          },
+          {
+            "/": "/search",
+            "?": { "q": "*" },
+            "comment": "Search pages open in the native app"
+          },
+          {
+            "/": "/.well-known/*",
+            "exclude": true,
+            "comment": "Exclude well-known paths"
+          },
+          {
+            "/": "/assets/*",
+            "exclude": true,
+            "comment": "Exclude static assets"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.playvod.ios"
+    ]
+  }
+}

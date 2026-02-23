@@ -1,0 +1,29 @@
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Header from "./Header.tsx";
+import Footer from "./Footer.tsx";
+import AppBanner from "./AppBanner.tsx";
+import { updateSmartBanner } from "../utils/deeplink.ts";
+
+export default function Layout() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  useEffect(() => {
+    updateSmartBanner(pathname);
+  }, [pathname]);
+
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <Header />
+      <AppBanner />
+      <main className="flex-1 pb-20">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
