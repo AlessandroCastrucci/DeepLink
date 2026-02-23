@@ -1,7 +1,7 @@
 import type { ContentItem, RubricItem } from "../types/content.ts";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || "https://bdutbevipdtnierfwixy.supabase.co";
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkdXRiZXZpcGR0bmllcmZ3aXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTY3MDYsImV4cCI6MjA4NzQzMjcwNn0.Ko53PZWSGRSuK1jZ8--6vFbEvGSB36i7s_0CzqJQimY";
 const PROXY_URL = `${SUPABASE_URL}/functions/v1/galaxy-proxy`;
 const DEFAULT_CAMPAIGN = "4679";
 
