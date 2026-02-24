@@ -2,15 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ContentItem } from "../types/content.ts";
 import { getHighlight, getHighlightTitle, formatDuration } from "../utils/assets.ts";
-import { useAuth } from "../context/AuthContext.tsx";
-
 interface HeroSliderProps {
   items: ContentItem[];
 }
 
 export default function HeroSlider({ items }: HeroSliderProps) {
   const [current, setCurrent] = useState(0);
-  const { user, openLogin } = useAuth();
   const navigate = useNavigate();
   const heroItems = items.filter((i) => getHighlight(i.assets)).slice(0, 6);
 
@@ -86,11 +83,7 @@ export default function HeroSlider({ items }: HeroSliderProps) {
 
           <button
             onClick={() => {
-              if (user) {
-                navigate(`/content/${item.content_id}`);
-              } else {
-                openLogin();
-              }
+              navigate(`/content/${item.content_id}`);
             }}
             className="mt-1 inline-flex w-fit items-center gap-2 rounded-lg bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
           >

@@ -16,11 +16,13 @@ import {
 import VideoPlayer from "../components/VideoPlayer.tsx";
 import ContentRow from "../components/ContentRow.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import { useAuth } from "../context/AuthContext.tsx";
 
 const RELATED_RUBRIC = "270102";
 
 export default function ContentDetailPage() {
   const { contentId } = useParams<{ contentId: string }>();
+  const { user, openLogin } = useAuth();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [related, setRelated] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,27 +135,51 @@ export default function ContentDetailPage() {
               )}
             </div>
           </div>
-          <a
-            href={openInAppUrl}
-            className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {user ? (
+            <a
+              href={openInAppUrl}
+              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
             >
-              <path d="M15 3h6v6" />
-              <path d="M10 14 21 3" />
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            </svg>
-            Ouvrir l'app
-          </a>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 3h6v6" />
+                <path d="M10 14 21 3" />
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              </svg>
+              Ouvrir l'app
+            </a>
+          ) : (
+            <button
+              onClick={openLogin}
+              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 3h6v6" />
+                <path d="M10 14 21 3" />
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              </svg>
+              Ouvrir l'app
+            </button>
+          )}
         </div>
 
         {content.description && (
