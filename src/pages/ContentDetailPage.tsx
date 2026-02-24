@@ -102,7 +102,7 @@ export default function ContentDetailPage() {
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-6">
-        <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white md:text-3xl">
               {content.title}
@@ -139,7 +139,7 @@ export default function ContentDetailPage() {
           {user ? (
             <a
               href={openInAppUrl}
-              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+              className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600 md:w-auto"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +161,7 @@ export default function ContentDetailPage() {
           ) : (
             <button
               onClick={openLogin}
-              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+              className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600 md:w-auto"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
