@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const BASE_URL = "https://userv1.dv-content.io";
-const SERVICE_ID = "2500";
+const SERVICE_ID = "39";
 const HASH_PREFIX = "f5c028c81f";
 const HASH_SUFFIX = "560e6cd05c8513b96062b0";
 
