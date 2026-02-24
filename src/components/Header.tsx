@@ -57,13 +57,13 @@ export default function Header() {
         ) : (
           <button
             onClick={openLogin}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-dark-600 text-gray-300 transition-colors hover:bg-dark-500 hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-500 text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
             title="Se connecter"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
