@@ -29,7 +29,8 @@ export default function ContentCard({
             src={coverUrl}
             alt={content.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-80"
+            className="img-fade h-full w-full object-cover group-hover:opacity-80"
+            onLoad={(e) => e.currentTarget.classList.add("loaded")}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-dark-600">

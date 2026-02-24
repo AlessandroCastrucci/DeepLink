@@ -91,7 +91,8 @@ export default function ContentDetailPage() {
             <img
               src={heroImage}
               alt={content.title}
-              className="h-full w-full object-cover"
+              className="img-fade h-full w-full object-cover"
+              onLoad={(e) => e.currentTarget.classList.add("loaded")}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent" />
           </div>

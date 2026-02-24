@@ -33,7 +33,8 @@ export default function HeroSlider({ items }: HeroSliderProps) {
           key={item.content_id}
           src={bgUrl}
           alt={item.title}
-          className="absolute inset-0 h-full w-full object-cover animate-[fadeIn_0.6s_ease]"
+          className="img-fade absolute inset-0 h-full w-full object-cover"
+          onLoad={(e) => e.currentTarget.classList.add("loaded")}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-dark-900/70 to-transparent" />
@@ -43,7 +44,8 @@ export default function HeroSlider({ items }: HeroSliderProps) {
             <img
               src={titleUrl}
               alt={item.title}
-              className="h-auto max-h-16 w-auto max-w-[280px] object-contain md:max-h-20 md:max-w-[400px]"
+              className="img-fade h-auto max-h-16 w-auto max-w-[280px] object-contain md:max-h-20 md:max-w-[400px]"
+              onLoad={(e) => e.currentTarget.classList.add("loaded")}
             />
           ) : (
             <h2 className="text-2xl font-bold text-white md:text-4xl">
