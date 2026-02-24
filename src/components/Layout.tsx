@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
 import AppBanner from "./AppBanner.tsx";
+import LoginModal from "./LoginModal.tsx";
 import { updateSmartBanner } from "../utils/deeplink.ts";
 
 export default function Layout() {
@@ -24,6 +25,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <LoginModal />
     </div>
   );
 }
