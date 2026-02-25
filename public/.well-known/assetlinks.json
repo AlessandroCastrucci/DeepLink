@@ -16,6 +16,7 @@
         "dynamic_app_link_components": [
           {"/": "/app"},
           {"/": "/app", "?": "authtoken": "*"},
+          {"/": "/detail", "?": {"id": "*"},
           {"/": "/detail", "?": {"id": "*", "authtoken": "*"}},
           {"/": "*", "exclude": true}
         ]
