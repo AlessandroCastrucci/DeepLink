@@ -10,6 +10,14 @@
       "sha256_cert_fingerprints": [
         "17:3A:96:17:C9:87:52:D7:D3:E9:33:B7:6D:87:F6:0B:48:E8:48:A1:3C:64:AF:79:94:9E:85:5C:CB:16:16:97"
       ]
+    },
+   "relation_extensions": {
+      "delegate_permission/common.handle_all_urls": {
+        "dynamic_app_link_components": [
+          {"/": "/detail", "?": {"id": "*"}},
+          {"/": "*", "exclude": true}
+        ]
+      }
     }
   }
 ]
