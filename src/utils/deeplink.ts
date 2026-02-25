@@ -1,6 +1,6 @@
 const APP_SCHEME = "playvod";
 const ANDROID_PACKAGE = "com.playvod.android";
-const IOS_APP_STORE_ID = "APPLE_APP_ID";
+const IOS_APP_STORE_ID = "1210318173";
 const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
 const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
