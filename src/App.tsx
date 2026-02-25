@@ -3,6 +3,7 @@ import Layout from "./components/Layout.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import CategoryPage from "./pages/CategoryPage.tsx";
 import ContentDetailPage from "./pages/ContentDetailPage.tsx";
+import DetailPage from "./pages/DetailPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 
 export default function App() {
@@ -10,6 +11,8 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/app" element={<HomePage />} />
+        <Route path="/detail" element={<DetailPage />} />
         <Route path="/category/:rubricId" element={<CategoryPage />} />
         <Route path="/content/:contentId" element={<ContentDetailPage />} />
         <Route path="/search" element={<SearchPage />} />

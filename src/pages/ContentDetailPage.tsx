@@ -20,8 +20,13 @@ import { useAuth } from "../context/AuthContext.tsx";
 
 const RELATED_RUBRIC = "270102";
 
-export default function ContentDetailPage() {
-  const { contentId } = useParams<{ contentId: string }>();
+interface Props {
+  overrideContentId?: string;
+}
+
+export default function ContentDetailPage({ overrideContentId }: Props = {}) {
+  const { contentId: paramContentId } = useParams<{ contentId: string }>();
+  const contentId = overrideContentId || paramContentId;
   const { user, openLogin } = useAuth();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [related, setRelated] = useState<CategoryRow[]>([]);

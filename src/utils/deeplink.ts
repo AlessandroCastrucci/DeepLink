@@ -15,12 +15,11 @@ export function detectPlatform(): Platform {
 
 export function buildDeepLinkPath(
   contentId?: number | string,
-  campaignId = "4679",
 ): string {
   if (contentId) {
-    return `/content/${contentId}?campaignId=${campaignId}`;
+    return `/detail?id=${contentId}`;
   }
-  return "/";
+  return "/app";
 }
 
 export function buildIntentUrl(

@@ -7,17 +7,23 @@
         ],
         "components": [
           {
-            "/": "/content/*",
-            "comment": "Content detail pages open in the native app"
+            "/": "/app",
+            "comment": "Main app entry point"
           },
           {
-            "/": "/category/*",
-            "comment": "Category pages open in the native app"
+            "/": "/app",
+            "?": { "authtoken": "*" },
+            "comment": "App entry with auth token"
           },
           {
-            "/": "/search",
-            "?": { "q": "*" },
-            "comment": "Search pages open in the native app"
+            "/": "/detail",
+            "?": { "id": "*" },
+            "comment": "Content detail by ID"
+          },
+          {
+            "/": "/detail",
+            "?": { "id": "*", "authtoken": "*" },
+            "comment": "Content detail with auth token"
           },
           {
             "/": "/.well-known/*",
