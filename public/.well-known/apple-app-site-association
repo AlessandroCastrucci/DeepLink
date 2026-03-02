@@ -1,18 +1,5 @@
 {
   "applinks": {
-    "substitutionVariables": {
-      "section": [
-        "home",
-        "download",
-        "account",
-        "settings"
-      ],
-      "rubric": [
-        "series",
-        "home",
-        "movies"
-      ]
-    },
     "details": [
       {
         "appIDs": [
@@ -20,51 +7,35 @@
         ],
         "components": [
           {
-            "/": "/section/$(section)",
-            "comment": "open specific section"
+            "/": "/app",
+            "comment": "open the app"
           },
           {
-            "/": "/rubric/$(rubric)",
-            "comment": "open detail specific rubric"
-          },
-          {
-            "/": "/category/*",
-            "comment": "open detail specific section"
-          },
-          {
+            "/": "/app",
             "?": {
               "authtoken": "*"
             },
-            "comment": "push auto-login value"
+            "comment": "open the app with auto-login"
           },
           {
+            "/": "/detail",
             "?": {
-              "snp_csid": "*"
+              "id": "*"
             },
-            "comment": "pass snowplow session"
+            "comment": "open detail page by id"
           },
           {
-            "/": "/debug",
+            "/": "/detail",
             "?": {
-              "authtoken": "*",
-              "country": "??",
-              "language": "??"
+              "id": "*",
+              "authtoken": "*"
             },
-            "comment": "force country and language only for debug"
+            "comment": "open detail page by id with auto-login"
           },
           {
-            "/": "/forgotpassword",
-            "?": {
-              "authtoken": "*",
-              "country": "??",
-              "language": "??"
-            },
-            "comment": "force country and language only for debug"
-          },
-          {
-            "/": "/",
+            "/": "*",
             "exclude": true,
-            "comment": "Exclude homepage"
+            "comment": "exclude all other paths"
           }
         ]
       }
