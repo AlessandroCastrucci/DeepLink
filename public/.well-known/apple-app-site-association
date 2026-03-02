@@ -11,26 +11,11 @@
             "comment": "open the app"
           },
           {
-            "/": "/app",
-            "?": {
-              "authtoken": "*"
-            },
-            "comment": "open the app with auto-login"
-          },
-          {
             "/": "/detail",
             "?": {
               "id": "*"
             },
             "comment": "open detail page by id"
-          },
-          {
-            "/": "/detail",
-            "?": {
-              "id": "*",
-              "authtoken": "*"
-            },
-            "comment": "open detail page by id with auto-login"
           },
           {
             "/": "*",
