@@ -26,9 +26,8 @@ export function buildIntentUrl(
   appPath: string,
   fallbackUrl: string,
 ): string {
-  const cleanPath = appPath.startsWith("/") ? appPath.slice(1) : appPath;
   return (
-    `intent://${cleanPath}#Intent;` +
+    `https://${window.location.host}${appPath}#Intent;` +
     `scheme=${APP_SCHEME};` +
     `package=${ANDROID_PACKAGE};` +
     `S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};` +
