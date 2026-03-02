@@ -1,47 +1,74 @@
 {
   "applinks": {
+    "substitutionVariables": {
+      "section": [
+        "home",
+        "download",
+        "account",
+        "settings"
+      ],
+      "rubric": [
+        "series",
+        "home",
+        "movies"
+      ]
+    },
     "details": [
       {
         "appIDs": [
-          "TEAM_ID.com.playvod.ios"
+          "SLXSGJ3GVX.com.virgoplay.playvod.af"
         ],
         "components": [
           {
-            "/": "/app",
-            "comment": "Main app entry point"
+            "/": "/section/$(section)",
+            "comment": "open specific section"
           },
           {
-            "/": "/app",
-            "?": { "authtoken": "*" },
-            "comment": "App entry with auth token"
+            "/": "/rubric/$(rubric)",
+            "comment": "open detail specific rubric"
           },
           {
-            "/": "/detail",
-            "?": { "id": "*" },
-            "comment": "Content detail by ID"
+            "/": "/category/*",
+            "comment": "open detail specific section"
           },
           {
-            "/": "/detail",
-            "?": { "id": "*", "authtoken": "*" },
-            "comment": "Content detail with auth token"
+            "?": {
+              "authtoken": "*"
+            },
+            "comment": "push auto-login value"
           },
           {
-            "/": "/.well-known/*",
+            "?": {
+              "snp_csid": "*"
+            },
+            "comment": "pass snowplow session"
+          },
+          {
+            "/": "/debug",
+            "?": {
+              "authtoken": "*",
+              "country": "??",
+              "language": "??"
+            },
+            "comment": "force country and language only for debug"
+          },
+          {
+            "/": "/forgotpassword",
+            "?": {
+              "authtoken": "*",
+              "country": "??",
+              "language": "??"
+            },
+            "comment": "force country and language only for debug"
+          },
+          {
+            "/": "/",
             "exclude": true,
-            "comment": "Exclude well-known paths"
-          },
-          {
-            "/": "/assets/*",
-            "exclude": true,
-            "comment": "Exclude static assets"
+            "comment": "Exclude homepage"
           }
         ]
       }
     ]
-  },
-  "webcredentials": {
-    "apps": [
-      "TEAM_ID.com.playvod.ios"
-    ]
   }
 }
+ 
