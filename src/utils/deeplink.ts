@@ -4,7 +4,7 @@ const IOS_APP_STORE_ID = "1210318173";
 const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
 const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
-const IOS_FALLBACK_DELAY = 1500;
+const FALLBACK_DELAY = 1500;
 
 export type Platform = "ios" | "android" | "desktop";
 
@@ -24,14 +24,8 @@ export function buildDeepLinkPath(
   return "/app";
 }
 
-export function buildIntentUrl(appPath: string): string {
-  return (
-    `https://${window.location.host}${appPath}#Intent;` +
-    `scheme=${APP_SCHEME};` +
-    `package=${ANDROID_PACKAGE};` +
-    `S.browser_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)};` +
-    `end;`
-  );
+export function buildAppLinkUrl(appPath: string): string {
+  return `${window.location.origin}${appPath}`;
 }
 
 export function buildCustomSchemeUrl(appPath: string): string {
@@ -45,34 +39,36 @@ export function getStoreUrl(platform: Platform): string {
   return ANDROID_STORE_URL;
 }
 
+function openWithVisibilityFallback(url: string, fallbackUrl: string): void {
+  let didLeave = false;
+
+  const onVisibilityChange = () => {
+    if (document.hidden) didLeave = true;
+  };
+
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
+  window.location.href = url;
+
+  setTimeout(() => {
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    if (!didLeave) {
+      window.location.href = fallbackUrl;
+    }
+  }, FALLBACK_DELAY);
+}
+
 export function openAppWithFallback(
   platform: Platform,
   appPath: string,
 ): void {
   if (platform === "android") {
-    window.location.href = buildIntentUrl(appPath);
+    openWithVisibilityFallback(buildAppLinkUrl(appPath), ANDROID_STORE_URL);
     return;
   }
 
   if (platform === "ios") {
-    const schemeUrl = buildCustomSchemeUrl(appPath);
-    let didLeave = false;
-
-    const onVisibilityChange = () => {
-      if (document.hidden) didLeave = true;
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    window.location.href = schemeUrl;
-
-    setTimeout(() => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      if (!didLeave) {
-        window.location.href = IOS_APP_STORE_URL;
-      }
-    }, IOS_FALLBACK_DELAY);
-
+    openWithVisibilityFallback(buildCustomSchemeUrl(appPath), IOS_APP_STORE_URL);
     return;
   }
 
