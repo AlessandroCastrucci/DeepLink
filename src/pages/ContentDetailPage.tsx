@@ -11,7 +11,7 @@ import {
 import {
   detectPlatform,
   buildDeepLinkPath,
-  getOpenInAppUrl,
+  openAppWithFallback,
 } from "../utils/deeplink.ts";
 import VideoPlayer from "../components/VideoPlayer.tsx";
 import ContentRow from "../components/ContentRow.tsx";
@@ -84,7 +84,10 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
   const heroImage = getHighlight(content.assets) || getArtBackground(content.assets);
   const platform = detectPlatform();
   const appPath = buildDeepLinkPath(content.content_id);
-  const openInAppUrl = getOpenInAppUrl(platform, appPath, window.location.href);
+
+  function handleOpenApp() {
+    openAppWithFallback(platform, appPath);
+  }
 
   return (
     <div>
@@ -141,51 +144,27 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
               )}
             </div>
           </div>
-          {user ? (
-            <a
-              href={openInAppUrl}
-              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+          <button
+            onClick={user ? handleOpenApp : openLogin}
+            className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M15 3h6v6" />
-                <path d="M10 14 21 3" />
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              </svg>
-              Ouvrir l'app
-            </a>
-          ) : (
-            <button
-              onClick={openLogin}
-              className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M15 3h6v6" />
-                <path d="M10 14 21 3" />
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              </svg>
-              Ouvrir l'app
-            </button>
-          )}
+              <path d="M15 3h6v6" />
+              <path d="M10 14 21 3" />
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            </svg>
+            Ouvrir l'app
+          </button>
         </div>
 
         {content.description && (

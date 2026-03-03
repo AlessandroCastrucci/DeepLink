@@ -3,8 +3,7 @@ import { useLocation } from "react-router-dom";
 import {
   detectPlatform,
   buildDeepLinkPath,
-  getOpenInAppUrl,
-  getStoreUrl,
+  openAppWithFallback,
   type Platform,
 } from "../utils/deeplink.ts";
 
@@ -33,9 +32,10 @@ export default function AppBanner() {
   const contentMatch = location.pathname.match(/^\/content\/(\d+)/);
   const contentId = contentMatch?.[1];
   const appPath = buildDeepLinkPath(contentId);
-  const currentUrl = window.location.href;
-  const openUrl = getOpenInAppUrl(platform, appPath, currentUrl);
-  const storeUrl = getStoreUrl(platform);
+
+  function handleOpen() {
+    openAppWithFallback(platform, appPath);
+  }
 
   return (
     <div className="fixed top-14 right-0 left-0 z-40 border-b border-dark-600 bg-dark-800/95 backdrop-blur-md">
@@ -62,20 +62,12 @@ export default function AppBanner() {
               : "Disponible sur Google Play"}
           </p>
         </div>
-        <a
-          href={openUrl}
+        <button
+          onClick={handleOpen}
           className="flex-shrink-0 rounded-lg bg-accent-500 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-600"
         >
           Ouvrir
-        </a>
-        <a
-          href={storeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-shrink-0 rounded-lg border border-dark-400 px-3 py-1.5 text-xs font-medium text-gray-300 transition-colors hover:border-gray-400"
-        >
-          Store
-        </a>
+        </button>
         <button
           onClick={dismiss}
           className="flex-shrink-0 p-1 text-gray-500 transition-colors hover:text-gray-300"

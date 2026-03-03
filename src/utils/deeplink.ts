@@ -4,6 +4,8 @@ const IOS_APP_STORE_ID = "1210318173";
 const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
 const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
+const IOS_FALLBACK_DELAY = 1500;
+
 export type Platform = "ios" | "android" | "desktop";
 
 export function detectPlatform(): Platform {
@@ -22,15 +24,12 @@ export function buildDeepLinkPath(
   return "/app";
 }
 
-export function buildIntentUrl(
-  appPath: string,
-  fallbackUrl: string,
-): string {
+export function buildIntentUrl(appPath: string): string {
   return (
     `https://${window.location.host}${appPath}#Intent;` +
     `scheme=${APP_SCHEME};` +
     `package=${ANDROID_PACKAGE};` +
-    `S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};` +
+    `S.browser_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)};` +
     `end;`
   );
 }
@@ -46,15 +45,38 @@ export function getStoreUrl(platform: Platform): string {
   return ANDROID_STORE_URL;
 }
 
-export function getOpenInAppUrl(
+export function openAppWithFallback(
   platform: Platform,
   appPath: string,
-  webFallbackUrl: string,
-): string {
+): void {
   if (platform === "android") {
-    return buildIntentUrl(appPath, webFallbackUrl);
+    window.location.href = buildIntentUrl(appPath);
+    return;
   }
-  return buildCustomSchemeUrl(appPath);
+
+  if (platform === "ios") {
+    const schemeUrl = buildCustomSchemeUrl(appPath);
+    let didLeave = false;
+
+    const onVisibilityChange = () => {
+      if (document.hidden) didLeave = true;
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    window.location.href = schemeUrl;
+
+    setTimeout(() => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (!didLeave) {
+        window.location.href = IOS_APP_STORE_URL;
+      }
+    }, IOS_FALLBACK_DELAY);
+
+    return;
+  }
+
+  window.location.href = getStoreUrl(platform);
 }
 
 export function updateSmartBanner(currentPath: string): void {
