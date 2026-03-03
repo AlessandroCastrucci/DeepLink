@@ -25,8 +25,9 @@ export function buildDeepLinkPath(
 }
 
 export function buildIntentUrl(appPath: string): string {
+  const cleanPath = appPath.startsWith("/") ? appPath.slice(1) : appPath;
   return (
-    `https://${window.location.host}${appPath}#Intent;` +
+    `intent://${cleanPath}#Intent;` +
     `scheme=${APP_SCHEME};` +
     `package=${ANDROID_PACKAGE};` +
     `S.browser_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)};` +
