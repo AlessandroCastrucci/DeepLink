@@ -24,8 +24,16 @@ export function buildDeepLinkPath(
   return "/app";
 }
 
-export function buildAppLinkUrl(appPath: string): string {
-  return `${window.location.origin}${appPath}`;
+export function buildAndroidIntentUrl(appPath: string): string {
+  const host = window.location.host;
+  const cleanPath = appPath.startsWith("/") ? appPath.slice(1) : appPath;
+  return (
+    `intent://${host}/${cleanPath}#Intent;` +
+    `scheme=https;` +
+    `package=${ANDROID_PACKAGE};` +
+    `S.browser_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)};` +
+    `end;`
+  );
 }
 
 export function buildCustomSchemeUrl(appPath: string): string {
@@ -63,7 +71,7 @@ export function openAppWithFallback(
   appPath: string,
 ): void {
   if (platform === "android") {
-    openWithVisibilityFallback(buildAppLinkUrl(appPath), ANDROID_STORE_URL);
+    window.location.href = buildAndroidIntentUrl(appPath);
     return;
   }
 
