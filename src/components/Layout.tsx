@@ -4,10 +4,21 @@ import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
 import AppBanner from "./AppBanner.tsx";
 import LoginModal from "./LoginModal.tsx";
-import { updateSmartBanner } from "../utils/deeplink.ts";
+import {
+  updateSmartBanner,
+  checkAppLinkAttempt,
+  getStoreUrl,
+} from "../utils/deeplink.ts";
 
 export default function Layout() {
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    const platform = checkAppLinkAttempt();
+    if (platform) {
+      window.location.href = getStoreUrl(platform);
+    }
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

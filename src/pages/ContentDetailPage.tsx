@@ -11,7 +11,8 @@ import {
 import {
   detectPlatform,
   buildDeepLinkPath,
-  openAppWithFallback,
+  buildAppLinkUrl,
+  markAppLinkAttempt,
 } from "../utils/deeplink.ts";
 import VideoPlayer from "../components/VideoPlayer.tsx";
 import ContentRow from "../components/ContentRow.tsx";
@@ -84,9 +85,16 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
   const heroImage = getHighlight(content.assets) || getArtBackground(content.assets);
   const platform = detectPlatform();
   const appPath = buildDeepLinkPath(content.content_id);
+  const appLinkUrl = buildAppLinkUrl(appPath);
 
-  function handleOpenApp() {
-    openAppWithFallback(platform, appPath);
+  function handleOpenApp(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    if (!user) {
+      openLogin();
+      return;
+    }
+    markAppLinkAttempt(platform);
+    window.location.href = appLinkUrl;
   }
 
   return (
@@ -144,8 +152,9 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
               )}
             </div>
           </div>
-          <button
-            onClick={user ? handleOpenApp : openLogin}
+          <a
+            href={appLinkUrl}
+            onClick={handleOpenApp}
             className="flex flex-shrink-0 items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
           >
             <svg
@@ -164,7 +173,7 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
             </svg>
             Ouvrir l'app
-          </button>
+          </a>
         </div>
 
         {content.description && (

@@ -1,10 +1,10 @@
-const APP_SCHEME = "playvod";
 const ANDROID_PACKAGE = "com.virgoplay.playvod.af";
 const IOS_APP_STORE_ID = "1210318173";
 const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
 const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
-const FALLBACK_DELAY = 1500;
+const APP_LINK_ATTEMPT_KEY = "app_link_attempt";
+const ATTEMPT_TTL_MS = 3000;
 
 export type Platform = "ios" | "android" | "desktop";
 
@@ -24,21 +24,8 @@ export function buildDeepLinkPath(
   return "/app";
 }
 
-export function buildAndroidIntentUrl(appPath: string): string {
-  const host = window.location.host;
-  const cleanPath = appPath.startsWith("/") ? appPath.slice(1) : appPath;
-  return (
-    `intent://${host}/${cleanPath}#Intent;` +
-    `scheme=https;` +
-    `package=${ANDROID_PACKAGE};` +
-    `S.browser_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)};` +
-    `end;`
-  );
-}
-
-export function buildCustomSchemeUrl(appPath: string): string {
-  const cleanPath = appPath.startsWith("/") ? appPath.slice(1) : appPath;
-  return `${APP_SCHEME}://${cleanPath}`;
+export function buildAppLinkUrl(appPath: string): string {
+  return `${window.location.origin}${appPath}`;
 }
 
 export function getStoreUrl(platform: Platform): string {
@@ -47,40 +34,63 @@ export function getStoreUrl(platform: Platform): string {
   return ANDROID_STORE_URL;
 }
 
-function openWithVisibilityFallback(url: string, fallbackUrl: string): void {
-  let didLeave = false;
+export function markAppLinkAttempt(platform: Platform): void {
+  sessionStorage.setItem(
+    APP_LINK_ATTEMPT_KEY,
+    JSON.stringify({ timestamp: Date.now(), platform }),
+  );
+}
 
-  const onVisibilityChange = () => {
-    if (document.hidden) didLeave = true;
-  };
+export function checkAppLinkAttempt(): Platform | null {
+  const raw = sessionStorage.getItem(APP_LINK_ATTEMPT_KEY);
+  if (!raw) return null;
 
-  document.addEventListener("visibilitychange", onVisibilityChange);
+  sessionStorage.removeItem(APP_LINK_ATTEMPT_KEY);
 
-  window.location.href = url;
-
-  setTimeout(() => {
-    document.removeEventListener("visibilitychange", onVisibilityChange);
-    if (!didLeave) {
-      window.location.href = fallbackUrl;
+  try {
+    const { timestamp, platform } = JSON.parse(raw);
+    if (Date.now() - timestamp < ATTEMPT_TTL_MS) {
+      return platform as Platform;
     }
-  }, FALLBACK_DELAY);
+  } catch {
+    /* corrupted entry */
+  }
+
+  return null;
 }
 
 export function openAppWithFallback(
   platform: Platform,
   appPath: string,
 ): void {
-  if (platform === "android") {
-    window.location.href = buildAndroidIntentUrl(appPath);
+  if (platform === "desktop") {
+    window.location.href = getStoreUrl(platform);
     return;
   }
 
-  if (platform === "ios") {
-    openWithVisibilityFallback(buildCustomSchemeUrl(appPath), IOS_APP_STORE_URL);
-    return;
-  }
+  const url = buildAppLinkUrl(appPath);
 
-  window.location.href = getStoreUrl(platform);
+  markAppLinkAttempt(platform);
+
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+
+  let didLeave = false;
+  const onVisibilityChange = () => {
+    if (document.hidden) didLeave = true;
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
+  setTimeout(() => {
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    if (!didLeave) {
+      window.location.href = getStoreUrl(platform);
+    }
+  }, ATTEMPT_TTL_MS);
 }
 
 export function updateSmartBanner(currentPath: string): void {

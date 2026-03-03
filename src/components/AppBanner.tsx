@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import {
   detectPlatform,
   buildDeepLinkPath,
-  openAppWithFallback,
+  buildAppLinkUrl,
+  markAppLinkAttempt,
   type Platform,
 } from "../utils/deeplink.ts";
 
@@ -32,9 +33,12 @@ export default function AppBanner() {
   const contentMatch = location.pathname.match(/^\/content\/(\d+)/);
   const contentId = contentMatch?.[1];
   const appPath = buildDeepLinkPath(contentId);
+  const appLinkUrl = buildAppLinkUrl(appPath);
 
-  function handleOpen() {
-    openAppWithFallback(platform, appPath);
+  function handleOpen(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    markAppLinkAttempt(platform);
+    window.location.href = appLinkUrl;
   }
 
   return (
@@ -62,12 +66,13 @@ export default function AppBanner() {
               : "Disponible sur Google Play"}
           </p>
         </div>
-        <button
+        <a
+          href={appLinkUrl}
           onClick={handleOpen}
           className="flex-shrink-0 rounded-lg bg-accent-500 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-600"
         >
           Ouvrir
-        </button>
+        </a>
         <button
           onClick={dismiss}
           className="flex-shrink-0 p-1 text-gray-500 transition-colors hover:text-gray-300"
