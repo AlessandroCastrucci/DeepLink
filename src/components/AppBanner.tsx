@@ -4,6 +4,8 @@ import {
   detectPlatform,
   buildDeepLinkPath,
   buildAppLinkUrl,
+  buildReferrer,
+  getStoredUserId,
   markAppLinkAttempt,
   type Platform,
 } from "../utils/deeplink.ts";
@@ -37,7 +39,11 @@ export default function AppBanner() {
 
   function handleOpen(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
-    markAppLinkAttempt(platform);
+    const referrer = buildReferrer({
+      userId: getStoredUserId(),
+      contentId: contentId || undefined,
+    });
+    markAppLinkAttempt(platform, referrer);
     window.location.href = appLinkUrl;
   }
 

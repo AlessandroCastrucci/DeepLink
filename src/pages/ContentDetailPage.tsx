@@ -12,6 +12,7 @@ import {
   detectPlatform,
   buildDeepLinkPath,
   buildAppLinkUrl,
+  buildReferrer,
   markAppLinkAttempt,
 } from "../utils/deeplink.ts";
 import VideoPlayer from "../components/VideoPlayer.tsx";
@@ -93,7 +94,11 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
       openLogin();
       return;
     }
-    markAppLinkAttempt(platform);
+    const referrer = buildReferrer({
+      userId: user.user_id,
+      contentId: String(content!.content_id),
+    });
+    markAppLinkAttempt(platform, referrer);
     window.location.href = appLinkUrl;
   }
 

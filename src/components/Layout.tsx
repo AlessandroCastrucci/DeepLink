@@ -14,9 +14,9 @@ export default function Layout() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const platform = checkAppLinkAttempt();
-    if (platform) {
-      window.location.href = getStoreUrl(platform);
+    const attempt = checkAppLinkAttempt();
+    if (attempt) {
+      window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
     }
   }, []);
 
