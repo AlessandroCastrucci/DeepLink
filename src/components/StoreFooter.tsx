@@ -1,3 +1,4 @@
+import { useParams, useSearchParams } from "react-router-dom";
 import {
   ANDROID_STORE_URL,
   IOS_APP_STORE_URL,
@@ -5,10 +6,19 @@ import {
   buildReferrer,
 } from "../utils/deeplink.ts";
 
-function getAndroidUrl(): string {
+function useContentId(): string | undefined {
+  const { contentId } = useParams<{ contentId: string }>();
+  const [searchParams] = useSearchParams();
+  return contentId || searchParams.get("id") || undefined;
+}
+
+function buildAndroidUrl(contentId?: string): string {
   const token = getStoredAuthToken();
-  if (token) {
-    const referrer = buildReferrer({ authToken: token });
+  if (token || contentId) {
+    const referrer = buildReferrer({
+      authToken: token,
+      contentId,
+    });
     return `${ANDROID_STORE_URL}&referrer=${encodeURIComponent(referrer)}`;
   }
   return ANDROID_STORE_URL;
@@ -47,11 +57,13 @@ function AppStoreBadge() {
 }
 
 export default function StoreFooter() {
+  const contentId = useContentId();
+
   return (
     <div className="fixed right-0 bottom-16 left-0 z-50 border-t border-dark-600 bg-dark-900/95 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-lg items-center justify-center gap-4 px-4">
         <a
-          href={getAndroidUrl()}
+          href={buildAndroidUrl(contentId)}
           target="_blank"
           rel="noopener noreferrer"
           className="transition-opacity hover:opacity-80"
