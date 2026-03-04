@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
+import StoreFooter from "./StoreFooter.tsx";
 import AppBanner from "./AppBanner.tsx";
 import LoginModal from "./LoginModal.tsx";
 import {
@@ -14,9 +15,9 @@ export default function Layout() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const platform = checkAppLinkAttempt();
-    if (platform) {
-      window.location.href = getStoreUrl(platform);
+    const attempt = checkAppLinkAttempt();
+    if (attempt) {
+      window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
     }
   }, []);
 
@@ -32,9 +33,10 @@ export default function Layout() {
     <div className="flex min-h-dvh flex-col">
       <Header />
       <AppBanner />
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-32">
         <Outlet />
       </main>
+      <StoreFooter />
       <Footer />
       <LoginModal />
     </div>
