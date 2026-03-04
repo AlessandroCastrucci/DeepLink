@@ -95,7 +95,7 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
       return;
     }
     const referrer = buildReferrer({
-      userId: user.user_id,
+      authToken: user.authToken,
       contentId: String(content!.content_id),
     });
     markAppLinkAttempt(platform, referrer);

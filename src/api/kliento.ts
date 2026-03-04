@@ -8,6 +8,7 @@ const PROXY_URL = `${SUPABASE_URL}/functions/v1/kliento-proxy`;
 
 export interface KlientoUser {
   user_id: string;
+  authToken?: string;
   email?: string;
   firstname?: string;
   lastname?: string;
@@ -23,6 +24,14 @@ interface LoginResponse {
   data: { user_id: number | boolean };
 }
 
+interface AccountInfoToken {
+  token: string;
+  content: string;
+  token_type: string;
+  immutable: boolean;
+  date_start: string;
+}
+
 interface AccountInfoResponse {
   code: number;
   error: number;
@@ -35,6 +44,7 @@ interface AccountInfoResponse {
     dve_login: string | null;
     subscribed: boolean | null;
     total_credit: number | null;
+    token?: AccountInfoToken[];
   }>;
   message?: string;
 }
@@ -83,8 +93,10 @@ export async function getAccountInfo(
   }
 
   const user = json.data[0];
+  const authTokenEntry = user.token?.find((t) => t.content === "authtoken");
   return {
     user_id: user.user_id,
+    authToken: authTokenEntry?.token,
     email: user.email ?? undefined,
     firstname: user.firstname ?? undefined,
     lastname: user.lastname ?? undefined,

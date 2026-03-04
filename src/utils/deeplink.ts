@@ -10,7 +10,7 @@ const ATTEMPT_TTL_MS = 3000;
 export type Platform = "ios" | "android" | "desktop";
 
 export interface ReferrerData {
-  userId?: string;
+  authToken?: string;
   contentId?: string;
 }
 
@@ -37,17 +37,17 @@ export function buildAppLinkUrl(appPath: string): string {
 export function buildReferrer(data: ReferrerData): string {
   const params = new URLSearchParams();
   params.set("utm_source", "webapp");
-  if (data.userId) params.set("userId", data.userId);
+  if (data.authToken) params.set("authToken", data.authToken);
   if (data.contentId) params.set("contentId", data.contentId);
   return params.toString();
 }
 
-export function getStoredUserId(): string | undefined {
+export function getStoredAuthToken(): string | undefined {
   try {
     const raw = localStorage.getItem(KLIENTO_SESSION_KEY);
     if (!raw) return undefined;
     const session = JSON.parse(raw);
-    return session.userId || undefined;
+    return session.authToken || undefined;
   } catch {
     return undefined;
   }

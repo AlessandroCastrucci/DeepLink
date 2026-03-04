@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const STORAGE_KEY = "kliento_session";
 
-function loadSession(): { userId: string } | null {
+function loadSession(): { userId: string; authToken?: string } | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -36,8 +36,8 @@ function loadSession(): { userId: string } | null {
   }
 }
 
-function saveSession(userId: string) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ userId }));
+function saveSession(userId: string, authToken?: string) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ userId, authToken }));
 }
 
 function clearSession() {
@@ -70,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await klientoLogin(username, password);
       if ("error" in result) return result.error;
 
-      saveSession(result.userId);
       const user = await getAccountInfo(result.userId);
+      saveSession(result.userId, user?.authToken);
       setState({ user, loading: false });
       setShowLogin(false);
       return null;
