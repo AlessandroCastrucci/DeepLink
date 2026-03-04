@@ -1,7 +1,7 @@
 const ANDROID_PACKAGE = "com.virgoplay.playvod.af";
 const IOS_APP_STORE_ID = "1210318173";
-const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
-const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
+export const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
+export const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
 const APP_LINK_ATTEMPT_KEY = "app_link_attempt";
 const KLIENTO_SESSION_KEY = "kliento_session";

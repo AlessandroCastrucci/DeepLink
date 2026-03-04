@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
+import StoreFooter from "./StoreFooter.tsx";
 import AppBanner from "./AppBanner.tsx";
 import LoginModal from "./LoginModal.tsx";
 import {
@@ -32,9 +33,10 @@ export default function Layout() {
     <div className="flex min-h-dvh flex-col">
       <Header />
       <AppBanner />
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-32">
         <Outlet />
       </main>
+      <StoreFooter />
       <Footer />
       <LoginModal />
     </div>
