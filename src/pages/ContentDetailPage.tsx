@@ -85,7 +85,7 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
   const trailerUrl = getTrailerUrl(content.deliveries);
   const heroImage = getHighlight(content.assets) || getArtBackground(content.assets);
   const platform = detectPlatform();
-  const appPath = buildDeepLinkPath(content.content_id);
+  const appPath = buildDeepLinkPath(content.content_id, user?.authToken);
   const appLinkUrl = buildAppLinkUrl(appPath);
 
   function handleOpenApp(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -98,8 +98,9 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
       authToken: user.authToken,
       contentId: String(content!.content_id),
     });
+    const freshPath = buildDeepLinkPath(content!.content_id, user.authToken);
     markAppLinkAttempt(platform, referrer);
-    window.location.href = appLinkUrl;
+    window.location.href = buildAppLinkUrl(freshPath);
   }
 
   return (

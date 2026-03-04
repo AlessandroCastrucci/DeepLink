@@ -9,6 +9,7 @@ import {
   updateSmartBanner,
   checkAppLinkAttempt,
   getStoreUrl,
+  getStoredAuthToken,
 } from "../utils/deeplink.ts";
 
 export default function Layout() {
@@ -26,7 +27,7 @@ export default function Layout() {
   }, [pathname]);
 
   useEffect(() => {
-    updateSmartBanner(pathname);
+    updateSmartBanner(pathname, getStoredAuthToken());
   }, [pathname]);
 
   return (

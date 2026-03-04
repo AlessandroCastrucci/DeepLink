@@ -23,11 +23,14 @@ export function detectPlatform(): Platform {
 
 export function buildDeepLinkPath(
   contentId?: number | string,
+  authToken?: string,
 ): string {
-  if (contentId) {
-    return `/detail?id=${contentId}`;
-  }
-  return "/app";
+  const params = new URLSearchParams();
+  if (contentId) params.set("id", String(contentId));
+  if (authToken) params.set("authToken", authToken);
+  const qs = params.toString();
+  if (contentId) return `/detail${qs ? `?${qs}` : ""}`;
+  return qs ? `/app?${qs}` : "/app";
 }
 
 export function buildAppLinkUrl(appPath: string): string {
@@ -121,12 +124,16 @@ export function openAppWithFallback(
   }, ATTEMPT_TTL_MS);
 }
 
-export function updateSmartBanner(currentPath: string): void {
+export function updateSmartBanner(currentPath: string, authToken?: string): void {
   const meta = document.querySelector('meta[name="apple-itunes-app"]');
   if (meta) {
+    const separator = currentPath.includes("?") ? "&" : "?";
+    const url = authToken
+      ? `${window.location.origin}${currentPath}${separator}authToken=${encodeURIComponent(authToken)}`
+      : `${window.location.origin}${currentPath}`;
     meta.setAttribute(
       "content",
-      `app-id=${IOS_APP_STORE_ID}, app-argument=${window.location.origin}${currentPath}`,
+      `app-id=${IOS_APP_STORE_ID}, app-argument=${url}`,
     );
   }
 }

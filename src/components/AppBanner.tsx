@@ -35,17 +35,20 @@ export default function AppBanner() {
 
   const contentMatch = location.pathname.match(/^\/content\/(\d+)/);
   const contentId = contentMatch?.[1] || searchParams.get("id") || undefined;
-  const appPath = buildDeepLinkPath(contentId);
+  const authToken = getStoredAuthToken();
+  const appPath = buildDeepLinkPath(contentId, authToken);
   const appLinkUrl = buildAppLinkUrl(appPath);
 
   function handleOpen(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
+    const token = getStoredAuthToken();
     const referrer = buildReferrer({
-      authToken: getStoredAuthToken(),
+      authToken: token,
       contentId: contentId || undefined,
     });
+    const freshPath = buildDeepLinkPath(contentId, token);
     markAppLinkAttempt(platform, referrer);
-    window.location.href = appLinkUrl;
+    window.location.href = buildAppLinkUrl(freshPath);
   }
 
   return (
