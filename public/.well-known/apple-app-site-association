@@ -7,11 +7,11 @@
         ],
         "components": [
           {
-            "/": "/app",
+            "/": "/",
             "comment": "open the app"
           },
           {
-            "/": "/detail",
+            "/": "/content",
             "?": {
               "id": "*"
             },
@@ -27,4 +27,3 @@
     ]
   }
 }
- 
