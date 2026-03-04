@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
   detectPlatform,
   buildDeepLinkPath,
@@ -16,6 +16,7 @@ export default function AppBanner() {
   const [visible, setVisible] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const p = detectPlatform();
@@ -33,7 +34,7 @@ export default function AppBanner() {
   if (!visible) return null;
 
   const contentMatch = location.pathname.match(/^\/content\/(\d+)/);
-  const contentId = contentMatch?.[1];
+  const contentId = contentMatch?.[1] || searchParams.get("id") || undefined;
   const appPath = buildDeepLinkPath(contentId);
   const appLinkUrl = buildAppLinkUrl(appPath);
 
