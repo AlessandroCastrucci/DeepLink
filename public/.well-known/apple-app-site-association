@@ -11,11 +11,15 @@
             "comment": "open the app"
           },
           {
-            "/": "/content",
+            "/": "/content/*",
+            "comment": "open content detail page by id in path"
+          },
+          {
+            "/": "/detail",
             "?": {
               "id": "*"
             },
-            "comment": "open detail page by id"
+            "comment": "open detail page with id query parameter"
           },
           {
             "/": "*",
