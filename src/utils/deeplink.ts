@@ -33,6 +33,19 @@ export function buildDeepLinkPath(
   return qs ? `/app?${qs}` : "/app";
 }
 
+export function buildResetPasswordPath(username: string): string {
+  const params = new URLSearchParams();
+  params.set("username", username);
+  return `/reset-password?${params.toString()}`;
+}
+
+export function openResetPassword(username: string): void {
+  const platform = detectPlatform();
+  const path = buildResetPasswordPath(username);
+  const authToken = getStoredAuthToken();
+  openAppWithFallback(platform, path, authToken ? `authToken=${authToken}` : undefined);
+}
+
 export function buildAppLinkUrl(appPath: string): string {
   return `${window.location.origin}${appPath}`;
 }
