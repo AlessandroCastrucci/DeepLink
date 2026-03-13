@@ -57,6 +57,12 @@ export function buildTVLoginDeeplink(pairingId: string): string {
   return buildAppLinkUrl(path);
 }
 
+export function buildAppDeeplink(authToken: string): string {
+  const params = new URLSearchParams();
+  params.set("authToken", authToken);
+  return `dvapp://app?${params.toString()}`;
+}
+
 export function buildAppLinkUrl(appPath: string): string {
   return `${window.location.origin}${appPath}`;
 }
