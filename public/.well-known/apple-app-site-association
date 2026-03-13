@@ -22,6 +22,28 @@
             "comment": "open detail page with id query parameter"
           },
           {
+            "/": "/reset-password",
+            "comment": "open reset password screen"
+          },
+          {
+            "/": "/reset-password",
+            "?": {
+              "username": "*"
+            },
+            "comment": "open reset password screen with username query parameter"
+          },
+          {
+            "/": "/tv-login",
+            "comment": "open tv-login flow"
+          },
+          {
+            "/": "/tv-login",
+            "?": {
+              "pairing_id": "*"
+            },
+            "comment": "open tv-login flow with pairing_id query parameter"
+          },
+          {
             "/": "*",
             "exclude": true,
             "comment": "exclude all other paths"
