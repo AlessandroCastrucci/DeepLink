@@ -15,9 +15,13 @@
       "delegate_permission/common.handle_all_urls": {
         "dynamic_app_link_components": [
           {"/": "/app"},
-          {"/": "/app", "?": {"authtoken": "*"}},
-          {"/": "/detail", "?": {"id": "*"}},
-          {"/": "/detail", "?": {"id": "*", "authtoken": "*"}},
+          {"/": "/app", "?": { "authtoken": "*" }},
+          {"/": "/detail", "?": { "id": "*" }},
+          {"/": "/detail", "?": { "id": "*", "authtoken": "*" }},
+          {"/": "/reset-password"},
+          {"/": "/reset-password", "?": { "username": "*" }},
+          {"/": "/tv-login"},
+          {"/": "/tv-login", "?": { "pairing_id": "*" }},
           {"/": "*", "exclude": true}
         ]
       }
