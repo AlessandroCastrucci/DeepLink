@@ -46,6 +46,17 @@ export function openResetPassword(username: string): void {
   openAppWithFallback(platform, path, authToken ? `authToken=${authToken}` : undefined);
 }
 
+export function buildTVLoginPath(pairingId: string): string {
+  const params = new URLSearchParams();
+  params.set("pairing_id", pairingId);
+  return `/tv-login?${params.toString()}`;
+}
+
+export function buildTVLoginDeeplink(pairingId: string): string {
+  const path = buildTVLoginPath(pairingId);
+  return buildAppLinkUrl(path);
+}
+
 export function buildAppLinkUrl(appPath: string): string {
   return `${window.location.origin}${appPath}`;
 }

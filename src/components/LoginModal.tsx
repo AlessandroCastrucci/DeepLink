@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "../context/AuthContext.tsx";
-import { openResetPassword } from "../utils/deeplink.ts";
+import { openResetPassword, buildTVLoginDeeplink } from "../utils/deeplink.ts";
+import QRCode from "qrcode";
+
+type LoginMode = "password" | "qrcode";
 
 export default function LoginModal() {
   const { showLogin, closeLogin, login } = useAuth();
+  const [loginMode, setLoginMode] = useState<LoginMode>("password");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,6 +16,30 @@ export default function LoginModal() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (showLogin && loginMode === "qrcode" && qrCanvasRef.current) {
+      const pairingId = "abc123";
+      const deeplink = buildTVLoginDeeplink(pairingId);
+
+      QRCode.toCanvas(
+        qrCanvasRef.current,
+        deeplink,
+        {
+          width: 220,
+          margin: 2,
+          color: {
+            dark: "#0f1629",
+            light: "#ffffff",
+          },
+        },
+        (error) => {
+          if (error) console.error("QR Code generation error:", error);
+        }
+      );
+    }
+  }, [showLogin, loginMode]);
 
   if (!showLogin) return null;
 
@@ -89,31 +117,79 @@ export default function LoginModal() {
           </svg>
         </button>
 
+        <div className="mb-6 flex gap-2 rounded-lg bg-dark-700 p-1">
+          <button
+            type="button"
+            onClick={() => setLoginMode("password")}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+              loginMode === "password"
+                ? "bg-accent-500 text-white shadow-md"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+          >
+            Mot de passe
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginMode("qrcode")}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+              loginMode === "qrcode"
+                ? "bg-accent-500 text-white shadow-md"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+          >
+            Code QR
+          </button>
+        </div>
+
         <div className="mb-7 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent-500/15 transition-transform hover:scale-105">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-accent-500"
-            >
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
+            {loginMode === "password" ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-accent-500"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-accent-500"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <rect x="7" y="7" width="3" height="3" />
+                <rect x="14" y="7" width="3" height="3" />
+                <rect x="7" y="14" width="3" height="3" />
+                <rect x="14" y="14" width="3" height="3" />
+              </svg>
+            )}
           </div>
           <h2 className="text-2xl font-bold text-white">Connexion</h2>
           <p className="mt-1.5 text-sm text-gray-400">
-            Connectez-vous pour accéder au contenu
+            {loginMode === "password"
+              ? "Connectez-vous pour accéder au contenu"
+              : "Scannez le code QR avec votre mobile"}
           </p>
         </div>
 
-        {!showConfirmDialog ? (
+        {!showConfirmDialog && loginMode === "password" ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label
@@ -259,7 +335,54 @@ export default function LoginModal() {
               {loading ? "Connexion..." : "Se connecter"}
             </button>
           </form>
-        ) : (
+        ) : !showConfirmDialog && loginMode === "qrcode" ? (
+          <div className="flex flex-col items-center animate-[slideUp_0.2s_ease]">
+            <div className="rounded-2xl bg-white p-4 shadow-lg">
+              <canvas ref={qrCanvasRef} />
+            </div>
+
+            <div className="mt-6 w-full rounded-lg bg-dark-700 border border-dark-600 p-4">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-white">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-accent-500"
+                >
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                Comment ça marche ?
+              </h3>
+              <ol className="space-y-2 text-xs text-gray-300">
+                <li className="flex gap-2">
+                  <span className="flex-shrink-0 font-semibold text-accent-400">1.</span>
+                  <span>Ouvrez l'application mobile sur votre téléphone</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="flex-shrink-0 font-semibold text-accent-400">2.</span>
+                  <span>Scannez ce code QR avec l'appareil photo ou depuis l'app</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="flex-shrink-0 font-semibold text-accent-400">3.</span>
+                  <span>Confirmez la connexion sur votre mobile</span>
+                </li>
+              </ol>
+            </div>
+
+            <div className="mt-4 rounded-lg bg-accent-500/10 border border-accent-500/20 px-4 py-2.5">
+              <p className="text-center text-xs text-accent-400">
+                <span className="font-semibold">ID de couplage:</span> abc123
+              </p>
+            </div>
+          </div>
+        ) : showConfirmDialog ? (
           <div className="animate-[slideUp_0.2s_ease]">
             <div className="mb-6 rounded-lg bg-dark-700 border border-dark-600 p-4">
               <div className="mb-3 flex items-center gap-2 text-accent-500">
@@ -303,7 +426,7 @@ export default function LoginModal() {
               </button>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
