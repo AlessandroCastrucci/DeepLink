@@ -4,15 +4,17 @@ import { useAuth } from "../context/AuthContext.tsx";
 import { openResetPassword, buildTVLoginDeeplink } from "../utils/deeplink.ts";
 import QRCode from "qrcode";
 
-type LoginMode = "password" | "qrcode";
+type LoginMode = "password" | "qrcode" | "phone";
 
 export default function LoginModal() {
   const { showLogin, closeLogin, login } = useAuth();
   const [loginMode, setLoginMode] = useState<LoginMode>("password");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -50,6 +52,32 @@ export default function LoginModal() {
     setLoading(true);
     try {
       const err = await login(username, password);
+      if (err) setError(err);
+    } catch {
+      setError("Erreur de connexion. Veuillez reessayer.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function validatePhoneNumber(phone: string): boolean {
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
+    return phoneRegex.test(phone);
+  }
+
+  async function handlePhoneSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setPhoneError("");
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      setPhoneError("Numéro de téléphone invalide");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const err = await login(phoneNumber, "", "msisdn-nopin");
       if (err) setError(err);
     } catch {
       setError("Erreur de connexion. Veuillez reessayer.");
@@ -121,7 +149,7 @@ export default function LoginModal() {
           <button
             type="button"
             onClick={() => setLoginMode("password")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+            className={`flex-1 rounded-md px-2 py-2 text-sm font-medium transition-all ${
               loginMode === "password"
                 ? "bg-accent-500 text-white shadow-md"
                 : "text-gray-400 hover:text-gray-300"
@@ -131,8 +159,19 @@ export default function LoginModal() {
           </button>
           <button
             type="button"
+            onClick={() => setLoginMode("phone")}
+            className={`flex-1 rounded-md px-2 py-2 text-sm font-medium transition-all ${
+              loginMode === "phone"
+                ? "bg-accent-500 text-white shadow-md"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+          >
+            Téléphone
+          </button>
+          <button
+            type="button"
             onClick={() => setLoginMode("qrcode")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+            className={`flex-1 rounded-md px-2 py-2 text-sm font-medium transition-all ${
               loginMode === "qrcode"
                 ? "bg-accent-500 text-white shadow-md"
                 : "text-gray-400 hover:text-gray-300"
@@ -160,6 +199,21 @@ export default function LoginModal() {
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
+            ) : loginMode === "phone" ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-accent-500"
+              >
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -185,11 +239,96 @@ export default function LoginModal() {
           <p className="mt-1.5 text-sm text-gray-400">
             {loginMode === "password"
               ? "Connectez-vous pour accéder au contenu"
-              : "Scannez le code QR avec votre mobile"}
+              : loginMode === "phone"
+                ? "Connectez-vous avec votre numéro de téléphone"
+                : "Scannez le code QR avec votre mobile"}
           </p>
         </div>
 
-        {!showConfirmDialog && loginMode === "password" ? (
+        {!showConfirmDialog && loginMode === "phone" ? (
+          <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-4">
+            <div>
+              <label
+                htmlFor="phone-number"
+                className="mb-1.5 block text-sm font-medium text-gray-300"
+              >
+                Numéro de téléphone
+              </label>
+              <input
+                id="phone-number"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  setPhoneError("");
+                }}
+                required
+                autoFocus
+                placeholder="+33 6 12 34 56 78"
+                className={`w-full rounded-lg border ${phoneError ? "border-red-500" : "border-dark-500"} bg-dark-700 px-3.5 py-2.5 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20`}
+              />
+              {phoneError && (
+                <div className="mt-1.5 flex items-center gap-1.5 text-xs text-red-400 animate-[slideUp_0.2s_ease]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  {phoneError}
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2.5 text-sm text-red-400 animate-[slideUp_0.2s_ease]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-0.5 flex-shrink-0"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : null}
+              {loading ? "Connexion..." : "S'abonner"}
+            </button>
+
+            <div className="mt-2 rounded-lg bg-dark-700 border border-dark-600 p-3">
+              <p className="text-xs text-gray-400 leading-relaxed">
+                En vous abonnant avec votre numéro de téléphone, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+              </p>
+            </div>
+          </form>
+        ) : !showConfirmDialog && loginMode === "password" ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label

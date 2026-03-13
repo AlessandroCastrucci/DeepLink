@@ -15,7 +15,7 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (username: string, password: string) => Promise<string | null>;
+  login: (username: string, password: string, loginType?: "msisdn-nopin") => Promise<string | null>;
   logout: () => void;
   showLogin: boolean;
   openLogin: () => void;
@@ -66,8 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (username: string, password: string): Promise<string | null> => {
-      const result = await klientoLogin(username, password);
+    async (username: string, password: string, loginType?: "msisdn-nopin"): Promise<string | null> => {
+      const result = await klientoLogin(username, password, loginType);
       if ("error" in result) return result.error;
 
       const user = await getAccountInfo(result.userId);

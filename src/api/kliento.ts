@@ -67,12 +67,20 @@ async function proxyFetch(params: Record<string, string>): Promise<unknown> {
 export async function login(
   username: string,
   password: string,
+  loginType?: "msisdn-nopin"
 ): Promise<{ userId: string } | { error: string }> {
-  const json = (await proxyFetch({
+  const params: Record<string, string> = {
     action: "login",
     login: username,
-    password,
-  })) as LoginResponse;
+  };
+
+  if (loginType === "msisdn-nopin") {
+    params.msisdn = username;
+  } else {
+    params.password = password;
+  }
+
+  const json = (await proxyFetch(params)) as LoginResponse;
 
   if (json.data?.user_id && typeof json.data.user_id === "number") {
     return { userId: String(json.data.user_id) };
