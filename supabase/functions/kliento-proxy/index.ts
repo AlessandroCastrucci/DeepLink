@@ -35,10 +35,11 @@ Deno.serve(async (req: Request) => {
     if (action === "login") {
       const login = url.searchParams.get("login") || "";
       const password = url.searchParams.get("password") || "";
+      const loginType = url.searchParams.get("loginType") || "dve";
 
-      if (!login || !password) {
+      if (!login) {
         return new Response(
-          JSON.stringify({ error: "Missing login or password" }),
+          JSON.stringify({ error: "Missing login" }),
           {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -46,8 +47,24 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const hashedPassword = await hashPassword(password);
-      const apiUrl = `${BASE_URL}/login/dve?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&password_dve=${hashedPassword}`;
+      let apiUrl: string;
+
+      if (loginType === "msisdn-nopin") {
+        apiUrl = `${BASE_URL}/login/msisdn?service_id=${SERVICE_ID}&msisdn=${encodeURIComponent(login)}`;
+      } else {
+        if (!password) {
+          return new Response(
+            JSON.stringify({ error: "Missing password" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+        const hashedPassword = await hashPassword(password);
+        apiUrl = `${BASE_URL}/login/dve?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&password_dve=${hashedPassword}`;
+      }
+
       const response = await fetch(apiUrl);
       const data = await response.json();
 
