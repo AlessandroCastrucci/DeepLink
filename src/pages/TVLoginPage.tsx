@@ -180,6 +180,37 @@ export default function TVLoginPage() {
           </div>
         )}
 
+        {confirmationCode && (
+          <div className="mb-6 rounded-lg bg-dark-700 border border-dark-600 p-4">
+            <div className="flex items-start gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-accent-500 flex-shrink-0 mt-0.5"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  Connexion depuis votre TV
+                </h3>
+                <p className="text-xs text-gray-400">
+                  Confirmez ce code sur votre téléviseur pour autoriser la connexion.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
           <label htmlFor="confirmation-code" className="mb-1.5 block text-sm font-medium text-gray-300">
             Code de confirmation
@@ -211,37 +242,6 @@ export default function TVLoginPage() {
             {loading ? 'Connexion...' : 'Confirmer'}
           </button>
         </div>
-
-        {confirmationCode && (
-          <div className="mt-6 rounded-lg bg-dark-700 border border-dark-600 p-4">
-            <div className="flex items-start gap-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-accent-500 flex-shrink-0 mt-0.5"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="16" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-              <div>
-                <h3 className="text-sm font-semibold text-white mb-1">
-                  Connexion depuis votre TV
-                </h3>
-                <p className="text-xs text-gray-400">
-                  Confirmez ce code sur votre téléviseur pour autoriser la connexion.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
