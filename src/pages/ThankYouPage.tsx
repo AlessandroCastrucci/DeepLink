@@ -8,7 +8,7 @@ export default function ThankYouPage() {
 
   function handleOpenApp() {
     if (user?.authToken) {
-      const deeplink = buildAppDeeplink(user.authToken);
+      const deeplink = buildReferrer(user.authToken);
       window.location.href = deeplink;
     }
   }
