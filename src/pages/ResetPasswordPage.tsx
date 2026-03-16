@@ -59,6 +59,26 @@ export default function ResetPasswordPage() {
     <div className="fixed inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 overflow-auto">
       <div className="flex min-h-full items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md">
+          <button
+            onClick={handleCancel}
+            className="mb-4 sm:mb-6 flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Retour
+          </button>
+
           <div className="rounded-2xl bg-dark-800/80 p-6 sm:p-8 shadow-2xl backdrop-blur-sm border border-dark-700">
             <div className="mb-6 sm:mb-8 text-center">
               <div className="mx-auto mb-3 sm:mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-accent-500/15">
