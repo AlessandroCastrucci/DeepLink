@@ -56,32 +56,12 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
-      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+    <div className="fixed inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 overflow-auto">
+      <div className="flex min-h-full items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md">
-          <button
-            onClick={handleCancel}
-            className="mb-6 flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Retour
-          </button>
-
-          <div className="rounded-2xl bg-dark-800/80 p-8 shadow-2xl backdrop-blur-sm border border-dark-700">
-            <div className="mb-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/15">
+          <div className="rounded-2xl bg-dark-800/80 p-6 sm:p-8 shadow-2xl backdrop-blur-sm border border-dark-700">
+            <div className="mb-6 sm:mb-8 text-center">
+              <div className="mx-auto mb-3 sm:mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-accent-500/15">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="32"
@@ -99,19 +79,19 @@ export default function ResetPasswordPage() {
                   <path d="M12 16h.01" />
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
                 Réinitialiser le mot de passe
               </h1>
-              <p className="mt-2 text-gray-400">
+              <p className="mt-2 text-sm sm:text-base text-gray-400">
                 Entrez votre nouveau mot de passe
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               <div>
                 <label
                   htmlFor="username"
-                  className="mb-2 block text-sm font-medium text-gray-300"
+                  className="mb-1.5 sm:mb-2 block text-sm font-medium text-gray-300"
                 >
                   Identifiant
                 </label>
@@ -120,14 +100,14 @@ export default function ResetPasswordPage() {
                   type="text"
                   value={username}
                   readOnly
-                  className="w-full rounded-lg border border-dark-500 bg-dark-700/50 px-4 py-3 text-gray-400 outline-none cursor-not-allowed"
+                  className="w-full rounded-lg border border-dark-500 bg-dark-700/50 px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-gray-400 outline-none cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="password"
-                  className="mb-2 block text-sm font-medium text-gray-300"
+                  className="mb-1.5 sm:mb-2 block text-sm font-medium text-gray-300"
                 >
                   Nouveau mot de passe
                 </label>
@@ -143,7 +123,7 @@ export default function ResetPasswordPage() {
                     required
                     autoFocus
                     placeholder="Entrez votre nouveau mot de passe"
-                    className="w-full rounded-lg border border-dark-500 bg-dark-700 px-4 py-3 pr-12 text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
+                    className="w-full rounded-lg border border-dark-500 bg-dark-700 px-3.5 sm:px-4 py-2.5 sm:py-3 pr-11 sm:pr-12 text-sm sm:text-base text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
                   />
                   <button
                     type="button"
@@ -207,22 +187,22 @@ export default function ResetPasswordPage() {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-2.5 sm:gap-3 pt-1">
                 <button
                   type="button"
                   onClick={handleCancel}
                   disabled={loading}
-                  className="flex-1 rounded-lg border border-dark-500 bg-dark-700 px-4 py-3.5 text-base font-semibold text-white transition-all hover:bg-dark-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-1 rounded-lg border border-dark-500 bg-dark-700 px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all hover:bg-dark-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading && (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   )}
                   {loading ? "Réinitialisation..." : "Confirmer"}
                 </button>
