@@ -28,6 +28,11 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError("");
 
+    if (!username) {
+      setError("Identifiant manquant");
+      return;
+    }
+
     if (!password) {
       setError("Veuillez entrer un nouveau mot de passe");
       return;
@@ -40,10 +45,24 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      // TODO: Implement actual password reset API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const params = new URLSearchParams({
+        service_id: "39",
+        login: username,
+        email: username,
+        password_dve: password,
+      });
 
-      // Navigate to home after successful reset
+      const response = await fetch(
+        `https://user.contactdve.com/account/create?${params.toString()}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Account creation failed");
+      }
+
       navigate("/");
     } catch {
       setError("Erreur lors de la réinitialisation. Veuillez réessayer.");
