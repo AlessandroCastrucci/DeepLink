@@ -78,7 +78,7 @@ Deno.serve(async (req: Request) => {
       const value = url.searchParams.get("value") || "";
       const password = url.searchParams.get("password") || "";
 
-      if (!credentialType || !value || !password) {
+      if (!credentialType || !password) {
         return new Response(
           JSON.stringify({ error: "Missing credentialType, value, or password" }),
           {
