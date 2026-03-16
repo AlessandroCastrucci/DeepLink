@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 
@@ -25,24 +25,30 @@ export default function TVLoginPage() {
     };
   }, [confirmationCode]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const err = await login(email, password);
-      if (err) {
-        setError(err);
-        setLoading(false);
+  async function handleConfirm() {
+    if (!user) {
+      if (!email || !password) {
+        setError('Veuillez remplir tous les champs');
+        return;
       }
-    } catch {
-      setError('Erreur de connexion. Veuillez réessayer.');
-      setLoading(false);
-    }
-  }
 
-  function handleConfirm() {
+      setError('');
+      setLoading(true);
+
+      try {
+        const err = await login(email, password);
+        if (err) {
+          setError(err);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        setError('Erreur de connexion. Veuillez réessayer.');
+        setLoading(false);
+        return;
+      }
+    }
+
     navigate('/');
   }
 
@@ -78,7 +84,7 @@ export default function TVLoginPage() {
         </div>
 
         {!user ? (
-          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+          <div className="space-y-4 mb-6">
             <div>
               <label htmlFor="tv-email" className="mb-1.5 block text-sm font-medium text-gray-300">
                 Email
@@ -88,7 +94,6 @@ export default function TVLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
                 autoFocus
                 placeholder="email@exemple.com"
@@ -106,7 +111,6 @@ export default function TVLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                   autoComplete="current-password"
                   placeholder="Votre mot de passe"
                   className="w-full rounded-lg border border-dark-500 bg-dark-700 px-3.5 py-2.5 pr-10 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
@@ -151,41 +155,30 @@ export default function TVLoginPage() {
                 </button>
               </div>
             </div>
-
-            {error && (
-              <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2.5 text-sm text-red-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mt-0.5 flex-shrink-0"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-accent-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {loading && (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              )}
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </button>
-          </form>
+          </div>
         ) : null}
+
+        {error && (
+          <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2.5 text-sm text-red-400 mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mt-0.5 flex-shrink-0"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
 
         <div className="mb-6">
           <label htmlFor="confirmation-code" className="mb-1.5 block text-sm font-medium text-gray-300">
@@ -209,10 +202,13 @@ export default function TVLoginPage() {
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!user}
-            className="flex-1 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-accent-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
+            className="flex-1 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-accent-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Confirmer
+            {loading && (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            )}
+            {loading ? 'Connexion...' : 'Confirmer'}
           </button>
         </div>
 
