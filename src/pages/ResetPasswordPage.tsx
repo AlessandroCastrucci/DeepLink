@@ -46,18 +46,19 @@ export default function ResetPasswordPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        service_id: "39",
+        action: "create",
         login: username,
         email: username,
-        password_dve: password,
+        password: password,
       });
 
-      const response = await fetch(
-        `https://user.contactdve.com/account/create?${params.toString()}`,
-        {
-          method: "GET",
-        }
-      );
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kliento-proxy?${params.toString()}`;
+      const headers = {
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+      };
+
+      const response = await fetch(apiUrl, { headers });
 
       if (!response.ok) {
         throw new Error("Account creation failed");

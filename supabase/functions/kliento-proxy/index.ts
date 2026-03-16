@@ -142,8 +142,32 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (action === "create") {
+      const login = url.searchParams.get("login") || "";
+      const email = url.searchParams.get("email") || "";
+      const password = url.searchParams.get("password") || "";
+
+      if (!login || !email || !password) {
+        return new Response(
+          JSON.stringify({ error: "Missing login, email or password" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const apiUrl = `https://user.contactdve.com/account/create?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&email=${encodeURIComponent(email)}&password_dve=${encodeURIComponent(password)}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(
-      JSON.stringify({ error: "Invalid action. Use 'login', 'create', or 'accountinfo'" }),
+      JSON.stringify({ error: "Invalid action. Use 'login', 'accountinfo' or 'create'" }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
