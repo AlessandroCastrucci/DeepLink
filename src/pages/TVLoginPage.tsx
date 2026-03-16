@@ -1,56 +1,251 @@
-import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.tsx';
 
 export default function TVLoginPage() {
   const [searchParams] = useSearchParams();
-  const pairingId = searchParams.get('pairing_id');
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
+  const confirmationCode = searchParams.get('pairing_id') || '';
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (pairingId) {
-      const deeplinkUrl = `dvapp://tv-login?pairing_id=${pairingId}`;
-      window.location.href = deeplinkUrl;
+    const meta = document.createElement('meta');
+    meta.name = 'apple-itunes-app';
+    meta.content = `app-id=YOUR_APP_ID, app-argument=dvapp://tv-login${confirmationCode ? `?pairing_id=${confirmationCode}` : ''}`;
+    document.head.appendChild(meta);
+
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, [confirmationCode]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const err = await login(email, password);
+      if (err) {
+        setError(err);
+        setLoading(false);
+      }
+    } catch {
+      setError('Erreur de connexion. Veuillez réessayer.');
+      setLoading(false);
     }
-  }, [pairingId]);
+  }
+
+  function handleConfirm() {
+    navigate('/');
+  }
+
+  function handleCancel() {
+    navigate('/');
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-lg shadow-xl p-8 text-center">
-        <div className="mb-6">
-          <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    <div className="min-h-screen bg-gradient-to-b from-dark-900 via-dark-800 to-black flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-dark-800 border border-dark-600 rounded-2xl shadow-2xl p-8">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/15">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-accent-500"
+            >
+              <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+              <polyline points="17 2 12 7 7 2" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">TV Login</h1>
-          {pairingId && (
-            <p className="text-gray-400 text-sm">
-              Pairing Code: <span className="text-blue-400 font-mono">{pairingId}</span>
-            </p>
-          )}
+          <h1 className="text-2xl font-bold text-white mb-2">Connexion TV</h1>
+          <p className="text-sm text-gray-400">
+            {user ? 'Confirmez votre connexion' : 'Connectez-vous pour continuer'}
+          </p>
         </div>
 
-        <div className="space-y-4 text-left">
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h2 className="text-white font-semibold mb-2">Opening App...</h2>
-            <p className="text-gray-300 text-sm">
-              If the app doesn't open automatically, please install it first.
-            </p>
-          </div>
+        {!user ? (
+          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+            <div>
+              <label htmlFor="tv-email" className="mb-1.5 block text-sm font-medium text-gray-300">
+                Email
+              </label>
+              <input
+                id="tv-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                autoFocus
+                placeholder="email@exemple.com"
+                className="w-full rounded-lg border border-dark-500 bg-dark-700 px-3.5 py-2.5 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
+              />
+            </div>
 
-          <div className="text-gray-400 text-xs space-y-2">
-            <p>This QR code is for pairing your TV with your mobile device.</p>
-            <p>Make sure you have the app installed on your phone.</p>
-          </div>
+            <div>
+              <label htmlFor="tv-password" className="mb-1.5 block text-sm font-medium text-gray-300">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  id="tv-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="Votre mot de passe"
+                  className="w-full rounded-lg border border-dark-500 bg-dark-700 px-3.5 py-2.5 pr-10 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-300"
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2.5 text-sm text-red-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-0.5 flex-shrink-0"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-accent-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading && (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              )}
+              {loading ? 'Connexion...' : 'Se connecter'}
+            </button>
+          </form>
+        ) : null}
+
+        <div className="mb-6">
+          <label htmlFor="confirmation-code" className="mb-1.5 block text-sm font-medium text-gray-300">
+            Code de confirmation
+          </label>
+          <input
+            id="confirmation-code"
+            type="text"
+            value={confirmationCode}
+            readOnly
+            className="w-full rounded-lg border border-dark-500 bg-dark-700 px-3.5 py-2.5 text-sm text-white font-mono outline-none cursor-not-allowed opacity-75"
+          />
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-700">
+        <div className="flex gap-3">
           <button
-            onClick={() => pairingId && (window.location.href = `dvapp://tv-login?pairing_id=${pairingId}`)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            onClick={handleCancel}
+            className="flex-1 rounded-lg border-2 border-dark-500 bg-transparent px-4 py-3 text-sm font-semibold text-gray-300 transition-all hover:bg-dark-700 hover:border-dark-400 active:scale-[0.98]"
           >
-            Open in App
+            Annuler
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={!user}
+            className="flex-1 rounded-lg bg-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-accent-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Confirmer
           </button>
         </div>
+
+        {confirmationCode && (
+          <div className="mt-6 rounded-lg bg-dark-700 border border-dark-600 p-4">
+            <div className="flex items-start gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-accent-500 flex-shrink-0 mt-0.5"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  Connexion depuis votre TV
+                </h3>
+                <p className="text-xs text-gray-400">
+                  Confirmez ce code sur votre téléviseur pour autoriser la connexion.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
