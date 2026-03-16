@@ -73,6 +73,53 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (action === "create") {
+      const credentialType = url.searchParams.get("credentialType") || "";
+      const value = url.searchParams.get("value") || "";
+      const password = url.searchParams.get("password") || "";
+
+      if (!credentialType || !value || !password) {
+        return new Response(
+          JSON.stringify({ error: "Missing credentialType, value, or password" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const params = new URLSearchParams({
+        service_id: SERVICE_ID,
+        password_dve: hashedPassword,
+      });
+
+      if (credentialType === "username") {
+        params.set("login", value);
+      } else if (credentialType === "email") {
+        params.set("email", value);
+      } else if (credentialType === "msisdn") {
+        params.set("msisdn", value);
+        params.set("login", value);
+      } else {
+        return new Response(
+          JSON.stringify({ error: "Invalid credentialType. Use 'username', 'email', or 'msisdn'" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const apiUrl = `${BASE_URL}/account/create?${params.toString()}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "accountinfo") {
       const userId = url.searchParams.get("user_id") || "";
 
@@ -96,7 +143,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(
-      JSON.stringify({ error: "Invalid action. Use 'login' or 'accountinfo'" }),
+      JSON.stringify({ error: "Invalid action. Use 'login', 'create', or 'accountinfo'" }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
