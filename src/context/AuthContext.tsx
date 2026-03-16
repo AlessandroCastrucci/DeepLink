@@ -17,6 +17,7 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   login: (username: string, password: string, loginType?: "msisdn-nopin") => Promise<string | null>;
   logout: () => void;
+  setUser: (user: KlientoUser | null) => void;
   showLogin: boolean;
   openLogin: () => void;
   closeLogin: () => void;
@@ -84,12 +85,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ user: null, loading: false });
   }, []);
 
+  const setUser = useCallback((user: KlientoUser | null) => {
+    if (user) {
+      saveSession(user.user_id, user.authToken);
+      setState({ user, loading: false });
+    } else {
+      clearSession();
+      setState({ user: null, loading: false });
+    }
+  }, []);
+
   const openLogin = useCallback(() => setShowLogin(true), []);
   const closeLogin = useCallback(() => setShowLogin(false), []);
 
   return (
     <AuthContext.Provider
-      value={{ ...state, login, logout, showLogin, openLogin, closeLogin }}
+      value={{ ...state, login, logout, setUser, showLogin, openLogin, closeLogin }}
     >
       {children}
     </AuthContext.Provider>

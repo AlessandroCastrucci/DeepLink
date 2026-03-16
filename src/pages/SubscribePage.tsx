@@ -2,10 +2,11 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
+import { createAccount, getAccountInfo } from "../api/kliento";
 
 export default function SubscribePage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { setUser } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [error, setError] = useState("");
@@ -28,12 +29,21 @@ export default function SubscribePage() {
 
     setLoading(true);
     try {
-      const err = await login(phoneNumber, "", "msisdn-nopin");
-      if (err) {
-        setError(err);
+      const result = await createAccount("msisdn", phoneNumber, "");
+
+      if ("error" in result) {
+        setError(result.error);
         setLoading(false);
-      } else {
+        return;
+      }
+
+      const userInfo = await getAccountInfo(result.userId);
+      if (userInfo) {
+        setUser(userInfo);
         navigate("/thank-you");
+      } else {
+        setError("Erreur lors de la récupération des informations du compte.");
+        setLoading(false);
       }
     } catch {
       setError("Erreur de connexion. Veuillez réessayer.");

@@ -88,6 +88,26 @@ export async function login(
   return { error: "Identifiants incorrects" };
 }
 
+export async function createAccount(
+  credentialType: "username" | "email" | "msisdn",
+  value: string,
+  password: string
+): Promise<{ userId: string } | { error: string }> {
+  const params: Record<string, string> = {
+    action: "create",
+    credentialType,
+    value,
+    password,
+  };
+
+  const json = (await proxyFetch(params)) as LoginResponse;
+
+  if (json.data?.user_id && typeof json.data.user_id === "number") {
+    return { userId: String(json.data.user_id) };
+  }
+  return { error: "Échec de création du compte" };
+}
+
 export async function getAccountInfo(
   userId: string,
 ): Promise<KlientoUser | null> {
