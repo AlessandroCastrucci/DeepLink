@@ -1,5 +1,5 @@
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || "https://kcassdxkjwiceddjjekd.supabase.co";
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjYXNzZHhrandpY2VkZGpqZWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjcxNTksImV4cCI6MjA4OTI0MzE1OX0.AoIg8kiUvLG3pu9JMgOH6JTUX1wIGMpLDsPaLfUR728";
 const PROXY_URL = `${SUPABASE_URL}/functions/v1/kliento-proxy`;
 
 export interface KlientoUser {
