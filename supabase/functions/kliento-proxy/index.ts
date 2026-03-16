@@ -78,9 +78,9 @@ Deno.serve(async (req: Request) => {
       const value = url.searchParams.get("value") || "";
       const password = url.searchParams.get("password") || "";
 
-      if (!credentialType || !password) {
+      if (!credentialType || !value) {
         return new Response(
-          JSON.stringify({ error: "Missing credentialType, value, or password" }),
+          JSON.stringify({ error: "Missing credentialType or value" }),
           {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -88,27 +88,38 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const hashedPassword = await hashPassword(password);
       const params = new URLSearchParams({
         service_id: SERVICE_ID,
-        password_dve: hashedPassword,
       });
 
-      if (credentialType === "username") {
-        params.set("login", value);
-      } else if (credentialType === "email") {
-        params.set("email", value);
-      } else if (credentialType === "msisdn") {
+      if (credentialType === "msisdn") {
         params.set("msisdn", value);
-        params.set("login", value);
       } else {
-        return new Response(
-          JSON.stringify({ error: "Invalid credentialType. Use 'username', 'email', or 'msisdn'" }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
+        if (!password) {
+          return new Response(
+            JSON.stringify({ error: "Password required for non-msisdn credentials" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+        const hashedPassword = await hashPassword(password);
+        params.set("password_dve", hashedPassword);
+
+        if (credentialType === "username") {
+          params.set("login", value);
+        } else if (credentialType === "email") {
+          params.set("email", value);
+        } else {
+          return new Response(
+            JSON.stringify({ error: "Invalid credentialType. Use 'username', 'email', or 'msisdn'" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
       }
 
       const apiUrl = `${BASE_URL}/account/create?${params.toString()}`;
