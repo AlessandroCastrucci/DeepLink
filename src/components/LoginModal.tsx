@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
-import { openResetPassword, buildTVLoginDeeplink } from "../utils/deeplink.ts";
+import { buildTVLoginDeeplink } from "../utils/deeplink.ts";
 import QRCode from "qrcode";
 
 type LoginMode = "password" | "qrcode";
@@ -82,7 +82,7 @@ export default function LoginModal() {
   function handleConfirmReset() {
     setShowConfirmDialog(false);
     closeLogin();
-    openResetPassword(username);
+    navigate(`/reset-password?username=${encodeURIComponent(username)}`);
   }
 
   function handleCancelReset() {
@@ -406,7 +406,7 @@ export default function LoginModal() {
                 <h3 className="font-semibold text-white">Réinitialisation du mot de passe</h3>
               </div>
               <p className="text-sm text-gray-300 leading-relaxed">
-                Vous allez être redirigé vers l'application pour réinitialiser le mot de passe du compte :
+                Vous allez réinitialiser le mot de passe du compte :
               </p>
               <p className="mt-2 rounded bg-dark-600 px-3 py-2 text-sm font-medium text-accent-400 break-all">
                 {username}
