@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
-import { buildTVLoginDeeplink } from "../utils/deeplink.ts";
+import { buildTVLoginDeeplink, detectPlatform, openResetPassword } from "../utils/deeplink.ts";
 import QRCode from "qrcode";
 
 type LoginMode = "password" | "qrcode";
@@ -17,7 +17,6 @@ export default function LoginModal() {
   const [usernameError, setUsernameError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -63,7 +62,6 @@ export default function LoginModal() {
   function handleBackdropClick(e: React.MouseEvent) {
     if (e.target === e.currentTarget) {
       closeLogin();
-      setShowConfirmDialog(false);
     }
   }
 
@@ -76,17 +74,14 @@ export default function LoginModal() {
       return;
     }
 
-    setShowConfirmDialog(true);
-  }
-
-  function handleConfirmReset() {
-    setShowConfirmDialog(false);
+    const platform = detectPlatform();
     closeLogin();
-    navigate(`/reset-password?username=${encodeURIComponent(username)}`);
-  }
 
-  function handleCancelReset() {
-    setShowConfirmDialog(false);
+    if (platform === "android") {
+      openResetPassword(username);
+    } else {
+      navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+    }
   }
 
   return (
@@ -96,10 +91,7 @@ export default function LoginModal() {
     >
       <div className="relative mx-4 w-full max-w-sm rounded-2xl border border-dark-600 bg-dark-800 p-6 shadow-2xl animate-[slideUp_0.3s_ease]">
         <button
-          onClick={() => {
-            closeLogin();
-            setShowConfirmDialog(false);
-          }}
+          onClick={closeLogin}
           className="absolute top-4 right-4 rounded-full p-1.5 text-gray-400 transition-all hover:bg-dark-600 hover:text-white hover:scale-110"
           aria-label="Fermer"
         >
@@ -191,7 +183,7 @@ export default function LoginModal() {
           </p>
         </div>
 
-        {!showConfirmDialog && loginMode === "password" ? (
+        {loginMode === "password" ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label
@@ -337,7 +329,7 @@ export default function LoginModal() {
               {loading ? "Connexion..." : "Se connecter"}
             </button>
           </form>
-        ) : !showConfirmDialog && loginMode === "qrcode" ? (
+        ) : loginMode === "qrcode" ? (
           <div className="flex flex-col items-center animate-[slideUp_0.2s_ease]">
             <div className="rounded-2xl bg-white p-4 shadow-lg">
               <canvas ref={qrCanvasRef} />
@@ -384,54 +376,9 @@ export default function LoginModal() {
               </p>
             </div>
           </div>
-        ) : showConfirmDialog ? (
-          <div className="animate-[slideUp_0.2s_ease]">
-            <div className="mb-6 rounded-lg bg-dark-700 border border-dark-600 p-4">
-              <div className="mb-3 flex items-center gap-2 text-accent-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <h3 className="font-semibold text-white">Réinitialisation du mot de passe</h3>
-              </div>
-              <p className="text-sm text-gray-300 leading-relaxed">
-                Vous allez réinitialiser le mot de passe du compte :
-              </p>
-              <p className="mt-2 rounded bg-dark-600 px-3 py-2 text-sm font-medium text-accent-400 break-all">
-                {username}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleCancelReset}
-                className="flex-1 rounded-lg border border-dark-500 bg-dark-700 px-4 py-2.5 text-sm font-medium text-gray-300 transition-all hover:bg-dark-600 hover:text-white active:scale-[0.98]"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleConfirmReset}
-                className="flex-1 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98]"
-              >
-                Confirmer
-              </button>
-            </div>
-          </div>
         ) : null}
 
-        {!showConfirmDialog && (
-          <div className="mt-6 border-t border-dark-600 pt-6">
+        <div className="mt-6 border-t border-dark-600 pt-6">
             <p className="mb-3 text-center text-sm text-gray-400">
               Vous n'avez pas de compte ?
             </p>
@@ -460,8 +407,7 @@ export default function LoginModal() {
               </svg>
               S'abonner maintenant
             </button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
