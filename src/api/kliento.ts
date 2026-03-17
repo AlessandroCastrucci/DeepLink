@@ -1,9 +1,5 @@
-const SUPABASE_URL =
-  (import.meta.env.VITE_SUPABASE_URL as string) ||
-  "https://bdutbevipdtnierfwixy.supabase.co";
-const SUPABASE_ANON_KEY =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkdXRiZXZpcGR0bmllcmZ3aXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTY3MDYsImV4cCI6MjA4NzQzMjcwNn0.Ko53PZWSGRSuK1jZ8--6vFbEvGSB36i7s_0CzqJQimY";
+const SUPABASE_URL = "https://kcassdxkjwiceddjjekd.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjYXNzZHhrandpY2VkZGpqZWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjcxNTksImV4cCI6MjA4OTI0MzE1OX0.AoIg8kiUvLG3pu9JMgOH6JTUX1wIGMpLDsPaLfUR728";
 const PROXY_URL = `${SUPABASE_URL}/functions/v1/kliento-proxy`;
 
 export interface KlientoUser {
@@ -67,17 +63,45 @@ async function proxyFetch(params: Record<string, string>): Promise<unknown> {
 export async function login(
   username: string,
   password: string,
+  loginType?: "msisdn-nopin"
 ): Promise<{ userId: string } | { error: string }> {
-  const json = (await proxyFetch({
+  const params: Record<string, string> = {
     action: "login",
     login: username,
-    password,
-  })) as LoginResponse;
+  };
+
+  if (loginType === "msisdn-nopin") {
+    params.msisdn = username;
+  } else {
+    params.password = password;
+  }
+
+  const json = (await proxyFetch(params)) as LoginResponse;
 
   if (json.data?.user_id && typeof json.data.user_id === "number") {
     return { userId: String(json.data.user_id) };
   }
   return { error: "Identifiants incorrects" };
+}
+
+export async function createAccount(
+  credentialType: "username" | "email" | "msisdn",
+  value: string,
+  password: string
+): Promise<{ userId: string } | { error: string }> {
+  const params: Record<string, string> = {
+    action: "create",
+    credentialType,
+    value,
+    password,
+  };
+
+  const json = (await proxyFetch(params)) as LoginResponse;
+
+  if (json.data?.user_id && typeof json.data.user_id === "number") {
+    return { userId: String(json.data.user_id) };
+  }
+  return { error: "Échec de création du compte" };
 }
 
 export async function getAccountInfo(

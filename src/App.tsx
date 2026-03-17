@@ -5,6 +5,10 @@ import CategoryPage from "./pages/CategoryPage.tsx";
 import ContentDetailPage from "./pages/ContentDetailPage.tsx";
 import DetailPage from "./pages/DetailPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
+import TVLoginPage from "./pages/TVLoginPage.tsx";
+import SubscribePage from "./pages/SubscribePage.tsx";
+import ThankYouPage from "./pages/ThankYouPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 
 export default function App() {
   return (
@@ -17,6 +21,10 @@ export default function App() {
         <Route path="/content/:contentId" element={<ContentDetailPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Route>
+      <Route path="/tv-login" element={<TVLoginPage />} />
+      <Route path="/subscribe" element={<SubscribePage />} />
+      <Route path="/thank-you" element={<ThankYouPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
     </Routes>
   );
 }

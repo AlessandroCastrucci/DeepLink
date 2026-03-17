@@ -35,10 +35,11 @@ Deno.serve(async (req: Request) => {
     if (action === "login") {
       const login = url.searchParams.get("login") || "";
       const password = url.searchParams.get("password") || "";
+      const loginType = url.searchParams.get("loginType") || "dve";
 
-      if (!login || !password) {
+      if (!login) {
         return new Response(
-          JSON.stringify({ error: "Missing login or password" }),
+          JSON.stringify({ error: "Missing login" }),
           {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -46,8 +47,82 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const hashedPassword = await hashPassword(password);
-      const apiUrl = `${BASE_URL}/login/dve?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&password_dve=${hashedPassword}`;
+      let apiUrl: string;
+
+      if (loginType === "msisdn-nopin") {
+        apiUrl = `${BASE_URL}/login/msisdn?service_id=${SERVICE_ID}&msisdn=${encodeURIComponent(login)}`;
+      } else {
+        if (!password) {
+          return new Response(
+            JSON.stringify({ error: "Missing password" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+        const hashedPassword = await hashPassword(password);
+        apiUrl = `${BASE_URL}/login/dve?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&password_dve=${hashedPassword}`;
+      }
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "create") {
+      const credentialType = url.searchParams.get("credentialType") || "";
+      const value = url.searchParams.get("value") || "";
+      const password = url.searchParams.get("password") || "";
+
+      if (!credentialType || !value) {
+        return new Response(
+          JSON.stringify({ error: "Missing credentialType or value" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const params = new URLSearchParams({
+        service_id: SERVICE_ID,
+      });
+
+      if (credentialType === "msisdn") {
+        params.set("msisdn", value);
+      } else {
+        if (!password) {
+          return new Response(
+            JSON.stringify({ error: "Password required for non-msisdn credentials" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+        const hashedPassword = await hashPassword(password);
+        params.set("password_dve", hashedPassword);
+
+        if (credentialType === "username") {
+          params.set("login", value);
+        } else if (credentialType === "email") {
+          params.set("email", value);
+        } else {
+          return new Response(
+            JSON.stringify({ error: "Invalid credentialType. Use 'username', 'email', or 'msisdn'" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+      }
+
+      const apiUrl = `${BASE_URL}/account/create?${params.toString()}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -78,8 +153,32 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (action === "create") {
+      const login = url.searchParams.get("login") || "";
+      const email = url.searchParams.get("email") || "";
+      const password = url.searchParams.get("password") || "";
+
+      if (!login || !email || !password) {
+        return new Response(
+          JSON.stringify({ error: "Missing login, email or password" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const apiUrl = `https://user.contactdve.com/account/create?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&email=${encodeURIComponent(email)}&password_dve=${encodeURIComponent(password)}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(
-      JSON.stringify({ error: "Invalid action. Use 'login' or 'accountinfo'" }),
+      JSON.stringify({ error: "Invalid action. Use 'login', 'accountinfo' or 'create'" }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

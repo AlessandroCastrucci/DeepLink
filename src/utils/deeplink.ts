@@ -33,6 +33,31 @@ export function buildDeepLinkPath(
   return qs ? `/app?${qs}` : "/app";
 }
 
+export function buildResetPasswordPath(username: string): string {
+  const params = new URLSearchParams();
+  params.set("username", username);
+  return `/reset-password?${params.toString()}`;
+}
+
+export function openResetPassword(username: string): void {
+  const platform = detectPlatform();
+  const path = buildResetPasswordPath(username);
+  const authToken = getStoredAuthToken();
+  openAppWithFallback(platform, path, authToken ? `authToken=${authToken}` : undefined);
+}
+
+export function buildTVLoginPath(pairingId: string): string {
+  const params = new URLSearchParams();
+  params.set("pairing_id", pairingId);
+  return `/tv-login?${params.toString()}`;
+}
+
+export function buildTVLoginDeeplink(pairingId: string): string {
+  const path = buildTVLoginPath(pairingId);
+  return buildAppLinkUrl(path);
+}
+
+
 export function buildAppLinkUrl(appPath: string): string {
   return `${window.location.origin}${appPath}`;
 }
@@ -42,7 +67,9 @@ export function buildReferrer(data: ReferrerData): string {
   params.set("utm_source", "webapp");
   if (data.authToken) params.set("authToken", data.authToken);
   if (data.contentId) params.set("contentId", data.contentId);
-  return params.toString();
+
+  const path = data.contentId ? `/detail` : '/app';
+  return `${window.location.origin}${path}?${params.toString()}`;
 }
 
 export function getStoredAuthToken(): string | undefined {
