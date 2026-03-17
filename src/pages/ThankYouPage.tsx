@@ -1,16 +1,26 @@
 import { useAuth } from "../context/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
-import { buildReferrer } from "../utils/deeplink.ts";
+import {
+  detectPlatform,
+  buildDeepLinkPath,
+  buildAppLinkUrl,
+  buildReferrer,
+  markAppLinkAttempt,
+} from "../utils/deeplink.ts";
 
 export default function ThankYouPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   function handleOpenApp() {
-    if (user?.authToken) {
-      const deeplink = buildReferrer({ authToken: user.authToken });
-      window.location.href = deeplink;
-    }
+    if (!user) return;
+
+    const platform = detectPlatform();
+    const referrer = buildReferrer({ authToken: user.authToken });
+    const appPath = buildDeepLinkPath(undefined, user.authToken);
+
+    markAppLinkAttempt(platform, referrer);
+    window.location.href = buildAppLinkUrl(appPath);
   }
 
   if (!user) {
