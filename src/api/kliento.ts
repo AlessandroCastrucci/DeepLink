@@ -130,3 +130,20 @@ export async function getAccountInfo(
     dve_login: user.dve_login ?? undefined,
   };
 }
+
+interface CheckMsisdnResponse {
+  code: number;
+  error: number;
+  data: {
+    success: number | false;
+  };
+}
+
+export async function checkMsisdnExists(msisdn: string): Promise<boolean> {
+  const json = (await proxyFetch({
+    action: "checkmsisdn",
+    msisdn,
+  })) as CheckMsisdnResponse;
+
+  return json.code === 200 && json.error === 0 && typeof json.data.success === "number";
+}

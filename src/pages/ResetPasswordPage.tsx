@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { updateSmartBanner, getStoredAuthToken } from "../utils/deeplink.ts";
+import { checkMsisdnExists } from "../api/kliento.ts";
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -12,13 +13,31 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     const usernameParam = searchParams.get("username");
     if (usernameParam) {
       setUsername(usernameParam);
+      validateUsername(usernameParam);
     }
   }, [searchParams]);
+
+  async function validateUsername(msisdn: string) {
+    if (!msisdn) return;
+
+    setValidating(true);
+    try {
+      const exists = await checkMsisdnExists(msisdn);
+      if (!exists) {
+        setError("Ce numéro n'existe pas dans notre système");
+      }
+    } catch (err) {
+      console.error("Error validating username:", err);
+    } finally {
+      setValidating(false);
+    }
+  }
 
   useEffect(() => {
     updateSmartBanner(`${location.pathname}${location.search}`, getStoredAuthToken());
@@ -45,6 +64,12 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
+      const exists = await checkMsisdnExists(username);
+      if (!exists) {
+        setError("Ce numéro n'existe pas dans notre système");
+        setLoading(false);
+        return;
+      }
       const params = new URLSearchParams({
         action: "create",
         login: username,
@@ -135,13 +160,20 @@ export default function ResetPasswordPage() {
                 >
                   Identifiant
                 </label>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  readOnly
-                  className="w-full rounded-lg border border-dark-500 bg-dark-700/50 px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-gray-400 outline-none cursor-not-allowed"
-                />
+                <div className="relative">
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    readOnly
+                    className="w-full rounded-lg border border-dark-500 bg-dark-700/50 px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-gray-400 outline-none cursor-not-allowed"
+                  />
+                  {validating && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400/30 border-t-gray-400" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -238,7 +270,7 @@ export default function ResetPasswordPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || validating}
                   className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading && (

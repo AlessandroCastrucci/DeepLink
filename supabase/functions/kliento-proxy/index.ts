@@ -153,6 +153,28 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (action === "checkmsisdn") {
+      const msisdn = url.searchParams.get("msisdn") || "";
+
+      if (!msisdn) {
+        return new Response(
+          JSON.stringify({ error: "Missing msisdn" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const apiUrl = `${BASE_URL}/accountinfo/ismsisdnexists?service_id=737&msisdn=${encodeURIComponent(msisdn)}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "create") {
       const login = url.searchParams.get("login") || "";
       const email = url.searchParams.get("email") || "";
@@ -178,7 +200,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(
-      JSON.stringify({ error: "Invalid action. Use 'login', 'accountinfo' or 'create'" }),
+      JSON.stringify({ error: "Invalid action. Use 'login', 'accountinfo', 'create', or 'checkmsisdn'" }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
