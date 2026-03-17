@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
-import { buildAppDeeplink } from "../utils/deeplink.ts";
+import { buildReferrer } from "../utils/deeplink.ts";
 
 export default function ThankYouPage() {
   const { user } = useAuth();
