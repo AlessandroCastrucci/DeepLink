@@ -67,7 +67,9 @@ export function buildReferrer(data: ReferrerData): string {
   params.set("utm_source", "webapp");
   if (data.authToken) params.set("authToken", data.authToken);
   if (data.contentId) params.set("contentId", data.contentId);
-  return params.toString();
+
+  const path = data.contentId ? `/detail` : '/app';
+  return `${window.location.origin}${path}?${params.toString()}`;
 }
 
 export function getStoredAuthToken(): string | undefined {
