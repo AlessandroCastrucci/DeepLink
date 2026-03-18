@@ -65,6 +65,7 @@ Deno.serve(async (req: Request) => {
         apiUrl = `${BASE_URL}/login/dve?service_id=${SERVICE_ID}&login=${encodeURIComponent(login)}&password_dve=${hashedPassword}`;
       }
 
+      console.log("[kliento-proxy] Login URL:", apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -123,6 +124,7 @@ Deno.serve(async (req: Request) => {
       }
 
       const apiUrl = `${BASE_URL}/account/create?${params.toString()}`;
+      console.log("[kliento-proxy] Create account URL:", apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -145,6 +147,7 @@ Deno.serve(async (req: Request) => {
       }
 
       const apiUrl = `${BASE_URL}/accountinfo/all?service_id=${SERVICE_ID}&user_id=${userId}`;
+      console.log("[kliento-proxy] Account info URL:", apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -167,6 +170,7 @@ Deno.serve(async (req: Request) => {
       }
 
       const apiUrl = `${BASE_URL}/accountinfo/ismsisdnexists?service_id=737&msisdn=${encodeURIComponent(msisdn)}`;
+      console.log("[kliento-proxy] Check MSISDN URL:", apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
 
