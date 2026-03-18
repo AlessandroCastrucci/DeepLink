@@ -169,7 +169,7 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const apiUrl = `${BASE_URL}/accountinfo/ismsisdnexists?service_id=737&msisdn=${encodeURIComponent(msisdn)}`;
+      const apiUrl = `${BASE_URL}/accountinfo/ismsisdnexists?service_id=${SERVICE_ID}&msisdn=${encodeURIComponent(msisdn)}`;
       console.log("[kliento-proxy] Check MSISDN URL:", apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
