@@ -77,7 +77,7 @@ export default function LoginModal() {
     const platform = detectPlatform();
     closeLogin();
 
-    if (platform === "android") {
+    if (platform === "android" || platform === "ios") {
       openResetPassword(username);
     } else {
       navigate(`/reset-password?username=${encodeURIComponent(username)}`);

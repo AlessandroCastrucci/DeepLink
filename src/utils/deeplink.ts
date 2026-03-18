@@ -42,8 +42,19 @@ export function buildResetPasswordPath(username: string): string {
 export function openResetPassword(username: string): void {
   const platform = detectPlatform();
   const path = buildResetPasswordPath(username);
-  const authToken = getStoredAuthToken();
-  openAppWithFallback(platform, path, authToken ? `authToken=${authToken}` : undefined);
+
+  if (platform === "desktop") {
+    return;
+  }
+
+  const url = buildAppLinkUrl(path);
+
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
 }
 
 export function buildTVLoginPath(pairingId: string): string {
