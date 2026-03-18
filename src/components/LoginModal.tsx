@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
 import { buildTVLoginDeeplink, detectPlatform, openResetPassword } from "../utils/deeplink.ts";
+import { checkMsisdnExists } from "../api/kliento.ts";
 import QRCode from "qrcode";
 
 type LoginMode = "password" | "qrcode";
@@ -65,7 +66,7 @@ export default function LoginModal() {
     }
   }
 
-  function handleForgotPasswordClick() {
+  async function handleForgotPasswordClick() {
     setError("");
     setUsernameError("");
 
@@ -74,13 +75,27 @@ export default function LoginModal() {
       return;
     }
 
-    const platform = detectPlatform();
-    closeLogin();
+    setLoading(true);
+    try {
+      const exists = await checkMsisdnExists(username);
 
-    if (platform === "android" || platform === "ios") {
-      openResetPassword(username);
-    } else {
-      navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      if (!exists) {
+        setUsernameError("Cet identifiant n'existe pas");
+        return;
+      }
+
+      const platform = detectPlatform();
+      closeLogin();
+
+      if (platform === "android" || platform === "ios") {
+        openResetPassword(username);
+      } else {
+        navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      }
+    } catch {
+      setError("Erreur lors de la vérification. Veuillez réessayer.");
+    } finally {
+      setLoading(false);
     }
   }
 
