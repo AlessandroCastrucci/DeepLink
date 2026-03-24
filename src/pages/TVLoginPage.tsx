@@ -31,24 +31,34 @@ export default function TVLoginPage() {
 
       try {
         const { code } = await requestDeviceCode();
+        console.log('Received pairing code:', code);
         setPairingCode(code);
 
-        if (qrCanvasRef.current) {
-          const deeplink = buildPairingDeeplink(code);
-          await QRCode.toCanvas(
-            qrCanvasRef.current,
-            deeplink,
-            {
-              width: 280,
-              margin: 2,
-              color: {
-                dark: '#1a2332',
-                light: '#ffffff',
-              },
-            }
-          );
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (!qrCanvasRef.current) {
+          console.error('Canvas ref not available');
+          setError('Erreur d\'initialisation du canvas');
+          return;
         }
 
+        const deeplink = buildPairingDeeplink(code);
+        console.log('Generating QR code for:', deeplink);
+
+        await QRCode.toCanvas(
+          qrCanvasRef.current,
+          deeplink,
+          {
+            width: 280,
+            margin: 2,
+            color: {
+              dark: '#1a2332',
+              light: '#ffffff',
+            },
+          }
+        );
+
+        console.log('QR code generated successfully');
         startPolling(code);
       } catch (err) {
         setError('Impossible de générer le code QR. Veuillez réessayer.');
@@ -146,7 +156,7 @@ export default function TVLoginPage() {
           >
             Mot de passe
           </button>
-          <buttond
+          <button
             onClick={() => setLoginMode('qrcode')}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               loginMode === 'qrcode'
@@ -301,7 +311,7 @@ export default function TVLoginPage() {
                 </div>
               ) : (
                 <div className="rounded-2xl bg-white p-4 shadow-lg">
-                  <canvas ref={qrCanvasRef} />
+                  <canvas ref={qrCanvasRef} width={280} height={280} />
                 </div>
               )}
 
