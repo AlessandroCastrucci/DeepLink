@@ -20,8 +20,8 @@
           {"/": "/detail", "?": { "id": "*", "authtoken": "*" }},
           {"/": "/reset-password"},
           {"/": "/reset-password", "?": { "username": "*" }},
-          {"/": "/tv-login"},
-          {"/": "/tv-login", "?": { "pairing_id": "*" }},
+          {"/": "/pair"},
+          {"/": "/pair", "?": { "code": "*" }},
           {"/": "*", "exclude": true}
         ]
       }
