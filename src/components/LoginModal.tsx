@@ -2,15 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
-import { buildTVLoginDeeplink, detectPlatform, openResetPassword } from "../utils/deeplink.ts";
-import { checkMsisdnExists } from "../api/kliento.ts";
+import { detectPlatform, openResetPassword } from "../utils/deeplink.ts";
+import { checkMsisdnExists, getAccountInfo } from "../api/kliento.ts";
+import { requestDeviceCode, pollDeviceAuth, buildPairingDeeplink } from "../api/deviceAuth.ts";
 import QRCode from "qrcode";
 
 type LoginMode = "password" | "qrcode";
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { showLogin, closeLogin, login } = useAuth();
+  const { showLogin, closeLogin, login, setUser } = useAuth();
   const [loginMode, setLoginMode] = useState<LoginMode>("password");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -18,30 +19,97 @@ export default function LoginModal() {
   const [usernameError, setUsernameError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [pairingCode, setPairingCode] = useState<string>("");
+  const [qrCodeLoading, setQrCodeLoading] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const pollIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (showLogin && loginMode === "qrcode" && qrCanvasRef.current) {
-      const pairingId = "abc123";
-      const deeplink = buildTVLoginDeeplink(pairingId);
+    async function initializeQRCode() {
+      if (!showLogin || loginMode !== "qrcode") return;
 
-      QRCode.toCanvas(
-        qrCanvasRef.current,
-        deeplink,
-        {
-          width: 220,
-          margin: 2,
-          color: {
-            dark: "#0f1629",
-            light: "#ffffff",
-          },
-        },
-        (error) => {
-          if (error) console.error("QR Code generation error:", error);
+      setQrCodeLoading(true);
+      setError("");
+
+      try {
+        const { code } = await requestDeviceCode();
+        setPairingCode(code);
+
+        if (qrCanvasRef.current) {
+          const deeplink = buildPairingDeeplink(code);
+          await QRCode.toCanvas(
+            qrCanvasRef.current,
+            deeplink,
+            {
+              width: 220,
+              margin: 2,
+              color: {
+                dark: "#0f1629",
+                light: "#ffffff",
+              },
+            }
+          );
         }
-      );
+
+        startPolling(code);
+      } catch (err) {
+        setError("Impossible de générer le code QR. Veuillez réessayer.");
+        console.error("QR Code initialization error:", err);
+      } finally {
+        setQrCodeLoading(false);
+      }
     }
+
+    if (showLogin && loginMode === "qrcode") {
+      initializeQRCode();
+    }
+
+    return () => {
+      stopPolling();
+    };
   }, [showLogin, loginMode]);
+
+  function startPolling(code: string) {
+    stopPolling();
+
+    pollIntervalRef.current = window.setInterval(async () => {
+      try {
+        const result = await pollDeviceAuth(code);
+
+        if (result.status === "complete" && result.user) {
+          stopPolling();
+          await handleQRLoginSuccess(result.user.user_id);
+        } else if (result.status === "expired") {
+          stopPolling();
+          setError("Le code a expiré. Veuillez fermer et réessayer.");
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000);
+  }
+
+  function stopPolling() {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+  }
+
+  async function handleQRLoginSuccess(userId: string) {
+    try {
+      const userInfo = await getAccountInfo(userId);
+      if (userInfo) {
+        setUser(userInfo);
+        closeLogin();
+      } else {
+        setError("Échec de récupération des informations utilisateur");
+      }
+    } catch (err) {
+      setError("Erreur lors de la connexion");
+      console.error("Login success handler error:", err);
+    }
+  }
 
   if (!showLogin) return null;
 
@@ -346,9 +414,16 @@ export default function LoginModal() {
           </form>
         ) : loginMode === "qrcode" ? (
           <div className="flex flex-col items-center animate-[slideUp_0.2s_ease]">
-            <div className="rounded-2xl bg-white p-4 shadow-lg">
-              <canvas ref={qrCanvasRef} />
-            </div>
+            {qrCodeLoading ? (
+              <div className="flex flex-col items-center justify-center h-[220px] w-[220px] rounded-2xl bg-white p-4 shadow-lg">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-accent-500" />
+                <p className="mt-3 text-xs text-gray-600">Génération du code...</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl bg-white p-4 shadow-lg">
+                <canvas ref={qrCanvasRef} />
+              </div>
+            )}
 
             <div className="mt-6 w-full rounded-lg bg-dark-700 border border-dark-600 p-4">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-white">
@@ -385,11 +460,14 @@ export default function LoginModal() {
               </ol>
             </div>
 
-            <div className="mt-4 rounded-lg bg-accent-500/10 border border-accent-500/20 px-4 py-2.5">
-              <p className="text-center text-xs text-accent-400">
-                <span className="font-semibold">ID de couplage:</span> abc123
-              </p>
-            </div>
+            {pairingCode && (
+              <div className="mt-4 rounded-lg bg-accent-500/10 border border-accent-500/20 px-4 py-2.5">
+                <p className="text-center text-xs text-accent-400">
+                  <span className="font-semibold">Code de couplage:</span>{" "}
+                  <span className="font-mono text-sm">{pairingCode}</span>
+                </p>
+              </div>
+            )}
           </div>
         ) : null}
 
