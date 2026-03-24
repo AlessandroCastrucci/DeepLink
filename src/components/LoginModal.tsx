@@ -21,7 +21,7 @@ export default function LoginModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [pairingCode, setPairingCode] = useState<string>("");
   const [qrCodeLoading, setQrCodeLoading] = useState(false);
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const pollIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -30,27 +30,23 @@ export default function LoginModal() {
 
       setQrCodeLoading(true);
       setError("");
+      setQrCodeDataUrl("");
 
       try {
         const { code } = await requestDeviceCode();
         setPairingCode(code);
 
-        if (qrCanvasRef.current) {
-          const deeplink = buildPairingDeeplink(code);
-          await QRCode.toCanvas(
-            qrCanvasRef.current,
-            deeplink,
-            {
-              width: 220,
-              margin: 2,
-              color: {
-                dark: "#0f1629",
-                light: "#ffffff",
-              },
-            }
-          );
-        }
+        const deeplink = buildPairingDeeplink(code);
+        const dataUrl = await QRCode.toDataURL(deeplink, {
+          width: 220,
+          margin: 2,
+          color: {
+            dark: "#0f1629",
+            light: "#ffffff",
+          },
+        });
 
+        setQrCodeDataUrl(dataUrl);
         startPolling(code);
       } catch (err) {
         setError("Impossible de générer le code QR. Veuillez réessayer.");
@@ -419,9 +415,19 @@ export default function LoginModal() {
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-accent-500" />
                 <p className="mt-3 text-xs text-gray-600">Génération du code...</p>
               </div>
-            ) : (
+            ) : qrCodeDataUrl ? (
               <div className="rounded-2xl bg-white p-4 shadow-lg">
-                <canvas ref={qrCanvasRef} />
+                <img
+                  src={qrCodeDataUrl}
+                  alt="QR Code"
+                  width={220}
+                  height={220}
+                  className="block"
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[220px] w-[220px] rounded-2xl bg-white p-4 shadow-lg">
+                <p className="text-xs text-gray-600">En attente du code QR...</p>
               </div>
             )}
 
