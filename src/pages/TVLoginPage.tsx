@@ -8,6 +8,8 @@ import QRCode from 'qrcode';
 type LoginMode = 'password' | 'qrcode';
 
 export default function TVLoginPage() {
+  console.log('[TVLoginPage] Component render');
+
   const navigate = useNavigate();
   const { login, setUser } = useAuth();
 
@@ -22,22 +24,34 @@ export default function TVLoginPage() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const pollIntervalRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    async function initializeQRCode() {
-      if (loginMode !== 'qrcode') return;
+  console.log('[TVLoginPage] State:', { loginMode, qrCodeLoading, hasQrCodeDataUrl: !!qrCodeDataUrl, pairingCode, error });
 
+  useEffect(() => {
+    console.log('[TVLoginPage] useEffect triggered, loginMode:', loginMode);
+
+    async function initializeQRCode() {
+      console.log('[TVLoginPage] initializeQRCode called');
+      if (loginMode !== 'qrcode') {
+        console.log('[TVLoginPage] Skipping - not in qrcode mode');
+        return;
+      }
+
+      console.log('[TVLoginPage] Setting loading state');
       setQrCodeLoading(true);
       setError('');
       setQrCodeDataUrl('');
 
       try {
+        console.log('[TVLoginPage] Requesting device code...');
         const { code } = await requestDeviceCode();
-        console.log('Received pairing code:', code);
+        console.log('[TVLoginPage] ✓ Received pairing code:', code);
+        window.alert(`DEBUG: Code received: ${code}`);
         setPairingCode(code);
 
         const deeplink = buildPairingDeeplink(code);
-        console.log('Generating QR code for:', deeplink);
+        console.log('[TVLoginPage] ✓ Generated deeplink:', deeplink);
 
+        console.log('[TVLoginPage] Generating QR code...');
         const dataUrl = await QRCode.toDataURL(deeplink, {
           width: 280,
           margin: 2,
@@ -47,20 +61,25 @@ export default function TVLoginPage() {
           },
         });
 
-        console.log('QR code generated successfully');
-        console.log('Data URL length:', dataUrl?.length);
-        console.log('Data URL preview:', dataUrl?.substring(0, 100));
+        console.log('[TVLoginPage] ✓ QR code generated!');
+        console.log('[TVLoginPage] Data URL length:', dataUrl?.length);
+        console.log('[TVLoginPage] Data URL preview:', dataUrl?.substring(0, 100));
+        window.alert(`DEBUG: QR generated, length: ${dataUrl?.length}`);
         setQrCodeDataUrl(dataUrl);
         startPolling(code);
       } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.error('[TVLoginPage] ✗ Error:', errorMsg, err);
+        window.alert(`DEBUG ERROR: ${errorMsg}`);
         setError('Impossible de générer le code QR. Veuillez réessayer.');
-        console.error('QR Code initialization error:', err);
       } finally {
+        console.log('[TVLoginPage] Setting loading to false');
         setQrCodeLoading(false);
       }
     }
 
     if (loginMode === 'qrcode') {
+      console.log('[TVLoginPage] Calling initializeQRCode');
       initializeQRCode();
     }
 
