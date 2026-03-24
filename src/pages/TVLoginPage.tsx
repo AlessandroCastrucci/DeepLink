@@ -19,7 +19,7 @@ export default function TVLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [pairingCode, setPairingCode] = useState<string>('');
   const [qrCodeLoading, setQrCodeLoading] = useState(false);
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const pollIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -28,37 +28,27 @@ export default function TVLoginPage() {
 
       setQrCodeLoading(true);
       setError('');
+      setQrCodeDataUrl('');
 
       try {
         const { code } = await requestDeviceCode();
         console.log('Received pairing code:', code);
         setPairingCode(code);
 
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        if (!qrCanvasRef.current) {
-          console.error('Canvas ref not available');
-          setError('Erreur d\'initialisation du canvas');
-          return;
-        }
-
         const deeplink = buildPairingDeeplink(code);
         console.log('Generating QR code for:', deeplink);
 
-        await QRCode.toCanvas(
-          qrCanvasRef.current,
-          deeplink,
-          {
-            width: 280,
-            margin: 2,
-            color: {
-              dark: '#1a2332',
-              light: '#ffffff',
-            },
-          }
-        );
+        const dataUrl = await QRCode.toDataURL(deeplink, {
+          width: 280,
+          margin: 2,
+          color: {
+            dark: '#1a2332',
+            light: '#ffffff',
+          },
+        });
 
         console.log('QR code generated successfully');
+        setQrCodeDataUrl(dataUrl);
         startPolling(code);
       } catch (err) {
         setError('Impossible de générer le code QR. Veuillez réessayer.');
@@ -305,13 +295,23 @@ export default function TVLoginPage() {
           ) : (
             <div className="flex flex-col items-center">
               {qrCodeLoading ? (
-                <div className="flex flex-col items-center justify-center h-[280px] w-full rounded-2xl bg-white p-4 shadow-lg">
+                <div className="flex flex-col items-center justify-center h-[280px] w-[280px] rounded-2xl bg-white p-4 shadow-lg">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-accent-500" />
                   <p className="mt-3 text-xs text-gray-600">Génération du code...</p>
                 </div>
-              ) : (
+              ) : qrCodeDataUrl ? (
                 <div className="rounded-2xl bg-white p-4 shadow-lg">
-                  <canvas ref={qrCanvasRef} width={280} height={280} />
+                  <img
+                    src={qrCodeDataUrl}
+                    alt="QR Code"
+                    width={280}
+                    height={280}
+                    className="block"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[280px] w-[280px] rounded-2xl bg-white p-4 shadow-lg">
+                  <p className="text-xs text-gray-600">En attente du code QR...</p>
                 </div>
               )}
 
