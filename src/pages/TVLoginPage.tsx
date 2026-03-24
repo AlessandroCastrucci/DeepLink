@@ -48,6 +48,8 @@ export default function TVLoginPage() {
         });
 
         console.log('QR code generated successfully');
+        console.log('Data URL length:', dataUrl?.length);
+        console.log('Data URL preview:', dataUrl?.substring(0, 100));
         setQrCodeDataUrl(dataUrl);
         startPolling(code);
       } catch (err) {
@@ -315,6 +317,13 @@ export default function TVLoginPage() {
                 </div>
               )}
 
+              {pairingCode && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-400 mb-1">Code d'appairage:</p>
+                  <p className="text-2xl font-bold text-white tracking-wider">{pairingCode}</p>
+                </div>
+              )}
+
               {error && (
                 <div className="mt-4 flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2.5 text-sm text-red-400">
                   <svg
@@ -335,6 +344,19 @@ export default function TVLoginPage() {
                   </svg>
                   <span>{error}</span>
                 </div>
+              )}
+
+              {(error || !qrCodeDataUrl) && !qrCodeLoading && (
+                <button
+                  onClick={() => {
+                    setError('');
+                    setLoginMode('password');
+                    setTimeout(() => setLoginMode('qrcode'), 50);
+                  }}
+                  className="mt-4 text-sm text-accent-400 hover:text-accent-300 underline"
+                >
+                  Réessayer
+                </button>
               )}
 
               <div className="mt-6 w-full rounded-lg bg-dark-700/50 border border-accent-500/30 p-4">
