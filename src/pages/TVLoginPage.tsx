@@ -146,7 +146,7 @@ export default function TVLoginPage() {
           >
             Mot de passe
           </button>
-          <button
+          <buttond
             onClick={() => setLoginMode('qrcode')}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               loginMode === 'qrcode'
