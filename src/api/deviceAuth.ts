@@ -9,11 +9,29 @@ interface DeviceCodeResponse {
 interface DevicePollResponse {
   status: "pending" | "complete" | "expired";
   user?: {
-    user_id: string;
-    email?: string;
-    firstname?: string;
-    lastname?: string;
-    nickname?: string;
+    code: string;
+    error: number;
+    data: {
+      "0": {
+        user_id: string;
+        email: string | null;
+        firstname?: string | null;
+        lastname?: string | null;
+        nickname?: string | null;
+        dve_login: string | null;
+        subscribed: boolean | null;
+        total_credit: string | null;
+        token?: Array<{
+          token: string;
+          content: string;
+          token_type: string;
+          immutable: boolean;
+          date_start: string;
+        }>;
+        offer?: Array<unknown>;
+        suspended?: boolean;
+      };
+    };
   };
 }
 

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import { requestDeviceCode, pollDeviceAuth, buildPairingDeeplink } from '../api/deviceAuth.ts';
-import { getAccountInfo } from '../api/kliento.ts';
 import QRCode from 'qrcode';
 
 type LoginMode = 'password' | 'qrcode';
@@ -72,7 +71,7 @@ export default function TVLoginPage() {
 
         if (result.status === 'complete' && result.user) {
           stopPolling();
-          await handleQRLoginSuccess(result.user.user_id);
+          handleQRLoginSuccess(result.user);
         } else if (result.status === 'expired') {
           stopPolling();
           setError('Le code a expiré. Veuillez recharger la page.');
@@ -90,15 +89,28 @@ export default function TVLoginPage() {
     }
   }
 
-  async function handleQRLoginSuccess(userId: string) {
+  function handleQRLoginSuccess(userData: NonNullable<Awaited<ReturnType<typeof pollDeviceAuth>>["user"]>) {
     try {
-      const userInfo = await getAccountInfo(userId);
-      if (userInfo) {
-        setUser(userInfo);
-        navigate('/');
-      } else {
+      if (userData.error !== 0 || !userData.data?.["0"]) {
         setError('Échec de récupération des informations utilisateur');
+        return;
       }
+
+      const user = userData.data["0"];
+      const authTokenEntry = user.token?.find((t) => t.content === "authtoken");
+
+      setUser({
+        user_id: user.user_id,
+        authToken: authTokenEntry?.token,
+        email: user.email ?? undefined,
+        firstname: user.firstname ?? undefined,
+        lastname: user.lastname ?? undefined,
+        nickname: user.nickname ?? undefined,
+        subscribed: user.subscribed,
+        total_credit: user.total_credit ? Number(user.total_credit) : undefined,
+        dve_login: user.dve_login ?? undefined,
+      });
+      navigate('/');
     } catch (err) {
       setError('Erreur lors de la connexion');
       console.error('Login success handler error:', err);
