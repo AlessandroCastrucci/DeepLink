@@ -1,38 +1,63 @@
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { detectPlatform, buildResetPasswordPath } from '../utils/deeplink.ts';
+import { checkMsisdnExists } from '../api/kliento.ts';
 
 export default function ConfirmResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const username = searchParams.get('username') || '';
+  const [username, setUsername] = useState(searchParams.get('username') || '');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   function handleCancel() {
     navigate(-1);
   }
 
-  function handleConfirm() {
-    const platform = detectPlatform();
-    const resetPath = buildResetPasswordPath(username);
+  async function handleConfirm() {
+    if (!username.trim()) {
+      setError('Veuillez entrer votre numéro de téléphone');
+      return;
+    }
 
-    if (platform === 'android') {
-      const appLinkUrl = `${window.location.origin}${resetPath}`;
+    setLoading(true);
+    setError('');
 
-      window.location.href = appLinkUrl;
+    try {
+      const exists = await checkMsisdnExists(username);
 
-      let didLeave = false;
-      const onVisibilityChange = () => {
-        if (document.hidden) didLeave = true;
-      };
-      document.addEventListener('visibilitychange', onVisibilityChange);
+      if (!exists) {
+        setError('Ce numéro de téléphone n\'est pas enregistré');
+        setLoading(false);
+        return;
+      }
 
-      setTimeout(() => {
-        document.removeEventListener('visibilitychange', onVisibilityChange);
-        if (!didLeave) {
-          navigate(`/reset-password?username=${encodeURIComponent(username)}`);
-        }
-      }, 3000);
-    } else {
-      navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      const platform = detectPlatform();
+      const resetPath = buildResetPasswordPath(username);
+
+      if (platform === 'android') {
+        const appLinkUrl = `${window.location.origin}${resetPath}`;
+
+        window.location.href = appLinkUrl;
+
+        let didLeave = false;
+        const onVisibilityChange = () => {
+          if (document.hidden) didLeave = true;
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
+        setTimeout(() => {
+          document.removeEventListener('visibilitychange', onVisibilityChange);
+          if (!didLeave) {
+            navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+          }
+        }, 3000);
+      } else {
+        navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      }
+    } catch {
+      setError('Erreur lors de la vérification. Veuillez réessayer.');
+      setLoading(false);
     }
   }
 
@@ -59,30 +84,50 @@ export default function ConfirmResetPasswordPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">
-            Confirmer la réinitialisation
+            Réinitialiser le mot de passe
           </h1>
           <p className="text-sm text-gray-400">
-            Êtes-vous sûr de vouloir réinitialiser votre mot de passe ?
+            Entrez votre numéro de téléphone pour continuer
           </p>
-          {username && (
-            <p className="text-xs text-gray-500">
-              Pour le compte: {username}
-            </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="username" className="mb-2 block text-sm font-medium text-gray-300">
+              Numéro de téléphone
+            </label>
+            <input
+              id="username"
+              type="tel"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Ex: 221771234567"
+              className="w-full rounded-lg border border-dark-600 bg-dark-700 px-4 py-3 text-white placeholder-gray-500 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
+              disabled={loading}
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+              {error}
+            </div>
           )}
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={handleCancel}
-            className="flex-1 rounded-lg border border-dark-600 bg-dark-700 px-4 py-3 font-medium text-white transition-all hover:bg-dark-600 hover:scale-105"
+            disabled={loading}
+            className="flex-1 rounded-lg border border-dark-600 bg-dark-700 px-4 py-3 font-medium text-white transition-all hover:bg-dark-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Annuler
           </button>
           <button
             onClick={handleConfirm}
-            className="flex-1 rounded-lg bg-accent-600 px-4 py-3 font-medium text-white transition-all hover:bg-accent-700 hover:scale-105"
+            disabled={loading}
+            className="flex-1 rounded-lg bg-accent-600 px-4 py-3 font-medium text-white transition-all hover:bg-accent-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Confirmer
+            {loading ? 'Vérification...' : 'Confirmer'}
           </button>
         </div>
       </div>
