@@ -164,7 +164,9 @@ export default function LoginModal() {
       const platform = detectPlatform();
       closeLogin();
 
-      if (platform === "android" || platform === "ios") {
+      if (platform === "android") {
+        navigate(`/confirm-reset-password?username=${encodeURIComponent(username)}`);
+      } else if (platform === "ios") {
         openResetPassword(username);
       } else {
         navigate(`/reset-password?username=${encodeURIComponent(username)}`);
