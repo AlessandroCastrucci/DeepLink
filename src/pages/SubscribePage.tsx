@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
-import { createAccount, getAccountInfo } from "../api/kliento";
+import { createAccount, getAccountInfo, checkMsisdnExists } from "../api/kliento";
 
 export default function SubscribePage() {
   const navigate = useNavigate();
@@ -29,6 +29,14 @@ export default function SubscribePage() {
 
     setLoading(true);
     try {
+      const exists = await checkMsisdnExists(phoneNumber);
+
+      if (exists) {
+        setError("Account Already exists");
+        setLoading(false);
+        return;
+      }
+
       const result = await createAccount("msisdn", phoneNumber, "");
 
       if ("error" in result) {
