@@ -57,6 +57,17 @@ export function openResetPassword(username: string): void {
   document.body.removeChild(anchor);
 }
 
+export function buildPairPath(code: string): string {
+  const params = new URLSearchParams();
+  params.set("code", code);
+  return `/pair?${params.toString()}`;
+}
+
+export function buildPairDeeplink(code: string): string {
+  const path = buildPairPath(code);
+  return buildAppLinkUrl(path);
+}
+
 export function buildTVLoginPath(pairingId: string): string {
   const params = new URLSearchParams();
   params.set("pairing_id", pairingId);

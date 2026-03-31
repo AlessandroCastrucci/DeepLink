@@ -7,12 +7,15 @@
         ],
         "components": [
           {
-            "/": "/",
+            "/": "/app",
             "comment": "open the app"
           },
           {
-            "/": "/content/*",
-            "comment": "open content detail page by id in path"
+            "/": "/app",
+            "?": {
+              "authtoken": "*"
+            },
+            "comment": "open the app with authtoken"
           },
           {
             "/": "/detail",
@@ -20,6 +23,14 @@
               "id": "*"
             },
             "comment": "open detail page with id query parameter"
+          },
+          {
+            "/": "/detail",
+            "?": {
+              "id": "*",
+              "authtoken": "*"
+            },
+            "comment": "open detail page with id and authtoken query parameters"
           },
           {
             "/": "/reset-password",
@@ -33,15 +44,15 @@
             "comment": "open reset password screen with username query parameter"
           },
           {
-            "/": "/tv-login",
-            "comment": "open tv-login flow"
+            "/": "/pair",
+            "comment": "open pair flow"
           },
           {
-            "/": "/tv-login",
+            "/": "/pair",
             "?": {
-              "pairing_id": "*"
+              "code": "*"
             },
-            "comment": "open tv-login flow with pairing_id query parameter"
+            "comment": "open pair flow with code query parameter"
           },
           {
             "/": "*",

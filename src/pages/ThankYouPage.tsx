@@ -1,16 +1,24 @@
 import { useAuth } from "../context/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import {
   detectPlatform,
   buildDeepLinkPath,
   buildAppLinkUrl,
   buildReferrer,
   markAppLinkAttempt,
+  updateSmartBanner,
 } from "../utils/deeplink.ts";
 
 export default function ThankYouPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.authToken) {
+      updateSmartBanner("/app", user.authToken);
+    }
+  }, [user]);
 
   function handleOpenApp() {
     if (!user) return;
