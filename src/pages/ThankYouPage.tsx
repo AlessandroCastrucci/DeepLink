@@ -27,7 +27,7 @@ export default function ThankYouPage() {
   }, []);
 
   useEffect(() => {
-    updateSmartBanner(`${location.pathname}${location.search}`, getStoredAuthToken());
+    updateSmartBanner('/app', getStoredAuthToken());
   }, [location]);
 
   function handleOpenApp() {
