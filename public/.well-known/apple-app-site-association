@@ -33,6 +33,21 @@
             "comment": "open detail page with id and authtoken query parameters"
           },
           {
+            "/": "/content/*",
+            "?": {
+              "id": "*"
+            },
+            "comment": "open content detail page with id query parameter"
+          },
+          {
+            "/": "/content/*",
+            "?": {
+              "id": "*",
+              "authtoken": "*"
+            },
+            "comment": "open content detail page with id and authtoken query parameters"
+          },
+          {
             "/": "/reset-password",
             "comment": "open reset password screen"
           },
