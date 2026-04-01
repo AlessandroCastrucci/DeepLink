@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import AppBanner from '../components/AppBanner.tsx';
 import {
   detectPlatform,
   buildResetPasswordPath,
   checkAppLinkAttempt,
   getStoreUrl,
+  updateSmartBanner,
+  getStoredAuthToken,
 } from '../utils/deeplink.ts';
 import { checkMsisdnExists } from '../api/kliento.ts';
 
 export default function ConfirmResetPasswordPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [username, setUsername] = useState(searchParams.get('username') || '');
   const [error, setError] = useState('');
@@ -22,6 +25,10 @@ export default function ConfirmResetPasswordPage() {
       window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
     }
   }, []);
+
+  useEffect(() => {
+    updateSmartBanner(`${location.pathname}${location.search}`, getStoredAuthToken());
+  }, [location]);
 
   function handleCancel() {
     navigate(-1);

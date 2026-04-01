@@ -21,7 +21,7 @@ export default function AppBanner() {
   useEffect(() => {
     const p = detectPlatform();
     setPlatform(p);
-    if (p !== "desktop" && !sessionStorage.getItem(DISMISSED_KEY)) {
+    if (p === "android" && !sessionStorage.getItem(DISMISSED_KEY)) {
       setVisible(true);
     }
   }, []);
