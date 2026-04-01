@@ -11,7 +11,7 @@
             "comment": "open the app"
           },
           {
-            "/": "/app",
+            "/": "/thank-you",
             "?": {
               "authtoken": "*"
             },
