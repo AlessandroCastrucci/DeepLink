@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { detectPlatform, buildResetPasswordPath } from '../utils/deeplink.ts';
+import AppBanner from '../components/AppBanner.tsx';
+import {
+  detectPlatform,
+  buildResetPasswordPath,
+  checkAppLinkAttempt,
+  getStoreUrl,
+} from '../utils/deeplink.ts';
 import { checkMsisdnExists } from '../api/kliento.ts';
 
 export default function ConfirmResetPasswordPage() {
@@ -9,6 +15,13 @@ export default function ConfirmResetPasswordPage() {
   const [username, setUsername] = useState(searchParams.get('username') || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const attempt = checkAppLinkAttempt();
+    if (attempt) {
+      window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
+    }
+  }, []);
 
   function handleCancel() {
     navigate(-1);
@@ -63,6 +76,7 @@ export default function ConfirmResetPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 px-4">
+      <AppBanner />
       <div className="w-full max-w-md space-y-8 rounded-2xl border border-dark-600 bg-dark-800 p-8 shadow-2xl">
         <div className="space-y-2 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/10">

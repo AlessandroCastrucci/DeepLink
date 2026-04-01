@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { updateSmartBanner, getStoredAuthToken } from "../utils/deeplink.ts";
+import AppBanner from "../components/AppBanner.tsx";
+import {
+  updateSmartBanner,
+  getStoredAuthToken,
+  checkAppLinkAttempt,
+  getStoreUrl,
+} from "../utils/deeplink.ts";
 import { checkMsisdnExists } from "../api/kliento.ts";
 
 export default function ResetPasswordPage() {
@@ -14,6 +20,13 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
+
+  useEffect(() => {
+    const attempt = checkAppLinkAttempt();
+    if (attempt) {
+      window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
+    }
+  }, []);
 
   useEffect(() => {
     const usernameParam = searchParams.get("username");
@@ -102,6 +115,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 overflow-auto">
+      <AppBanner />
       <div className="flex min-h-full items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md">
           <button
