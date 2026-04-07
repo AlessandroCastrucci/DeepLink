@@ -4,6 +4,11 @@ import type { ContentItem, CategoryRow } from "../types/content.ts";
 import HeroSlider from "../components/HeroSlider.tsx";
 import ContentRow from "../components/ContentRow.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import {
+  detectPlatform,
+  updateSmartBanner,
+  getStoredAuthToken,
+} from "../utils/deeplink.ts";
 
 const HIGHLIGHT_RUBRIC = "268833";
 const CATEGORY_RUBRICS =
@@ -13,6 +18,13 @@ export default function HomePage() {
   const [heroItems, setHeroItems] = useState<ContentItem[]>([]);
   const [rows, setRows] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const platform = detectPlatform();
+    if (platform === "ios") {
+      updateSmartBanner("/", getStoredAuthToken());
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

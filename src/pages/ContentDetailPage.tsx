@@ -14,6 +14,8 @@ import {
   buildAppLinkUrl,
   buildReferrer,
   markAppLinkAttempt,
+  updateSmartBanner,
+  getStoredAuthToken,
 } from "../utils/deeplink.ts";
 import VideoPlayer from "../components/VideoPlayer.tsx";
 import ContentRow from "../components/ContentRow.tsx";
@@ -35,6 +37,14 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
   const [loading, setLoading] = useState(true);
 
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  useEffect(() => {
+    const platform = detectPlatform();
+    if (platform === "ios" && contentId) {
+      const path = `/content/${contentId}`;
+      updateSmartBanner(path, getStoredAuthToken());
+    }
+  }, [contentId]);
 
   useEffect(() => {
     if (!contentId) return;
