@@ -7,7 +7,7 @@
         ],
         "components": [
           {
-            "/": "/app",
+            "/": "/",
             "comment": "open the app"
           },
           {
