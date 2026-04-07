@@ -1,5 +1,5 @@
 import { useAuth } from "../context/AuthContext.tsx";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AppBanner from "../components/AppBanner.tsx";
 import {
@@ -18,24 +18,21 @@ import {
 export default function ThankYouPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [platform, setPlatform] = useState<Platform>("desktop");
 
   useEffect(() => {
     const detectedPlatform = detectPlatform();
     setPlatform(detectedPlatform);
 
+    if (detectedPlatform === "ios") {
+      updateSmartBanner('/thank-you', getStoredAuthToken());
+    }
+
     const attempt = checkAppLinkAttempt();
     if (attempt && attempt.platform !== "ios") {
       window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
     }
   }, []);
-
-  useEffect(() => {
-    if (platform === "ios") {
-      updateSmartBanner('/', getStoredAuthToken());
-    }
-  }, [location, platform]);
 
   function handleOpenApp() {
     if (!user) return;
