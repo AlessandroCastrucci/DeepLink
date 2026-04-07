@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import AppBanner from '../components/AppBanner.tsx';
+import Toast from '../components/Toast.tsx';
 import {
   detectPlatform,
   buildResetPasswordPath,
@@ -18,6 +19,7 @@ export default function ConfirmResetPasswordPage() {
   const [username, setUsername] = useState(searchParams.get('username') || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const attempt = checkAppLinkAttempt();
@@ -42,6 +44,7 @@ export default function ConfirmResetPasswordPage() {
 
     setLoading(true);
     setError('');
+    setShowToast(true);
 
     try {
       const exists = await checkMsisdnExists(username);
@@ -152,6 +155,12 @@ export default function ConfirmResetPasswordPage() {
           </button>
         </div>
       </div>
+      {showToast && (
+        <Toast
+          message="You'll be sent to native app for reset password"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
