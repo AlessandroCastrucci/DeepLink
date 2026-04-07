@@ -4,6 +4,7 @@ import type { ContentItem, CategoryRow } from "../types/content.ts";
 import HeroSlider from "../components/HeroSlider.tsx";
 import ContentRow from "../components/ContentRow.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import { useAuth } from "../context/AuthContext.tsx";
 import {
   detectPlatform,
   updateSmartBanner,
@@ -15,16 +16,17 @@ const CATEGORY_RUBRICS =
   "273536,268860,295883,287837,294356,291318,287839,287838,287840,268858,268859,268857,270101,273535,268866,273694,283300,268844,268850,268845";
 
 export default function HomePage() {
+  const { loading: authLoading } = useAuth();
   const [heroItems, setHeroItems] = useState<ContentItem[]>([]);
   const [rows, setRows] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const platform = detectPlatform();
-    if (platform === "ios") {
+    if (platform === "ios" && !authLoading) {
       updateSmartBanner("/", getStoredAuthToken());
     }
-  }, []);
+  }, [authLoading]);
 
   useEffect(() => {
     let cancelled = false;
