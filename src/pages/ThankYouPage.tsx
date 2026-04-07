@@ -33,7 +33,7 @@ export default function ThankYouPage() {
 
   useEffect(() => {
     if (platform === "ios") {
-      updateSmartBanner('/app', getStoredAuthToken());
+      updateSmartBanner('/', getStoredAuthToken());
     }
   }, [location, platform]);
 
