@@ -4,6 +4,11 @@ import { searchContent } from "../api/galaxy.ts";
 import type { ContentItem } from "../types/content.ts";
 import ContentCard from "../components/ContentCard.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import {
+  detectPlatform,
+  updateSmartBanner,
+  getStoredAuthToken,
+} from "../utils/deeplink.ts";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,6 +16,15 @@ export default function SearchPage() {
   const [results, setResults] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    const platform = detectPlatform();
+    if (platform === "ios") {
+      const q = searchParams.get("q");
+      const path = q ? `/search?q=${encodeURIComponent(q)}` : "/search";
+      updateSmartBanner(path, getStoredAuthToken());
+    }
+  }, [searchParams]);
 
   const performSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;

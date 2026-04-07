@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
 import { createAccount, getAccountInfo, checkMsisdnExists } from "../api/kliento";
+import {
+  detectPlatform,
+  updateSmartBanner,
+  getStoredAuthToken,
+} from "../utils/deeplink.ts";
 
 export default function SubscribePage() {
   const navigate = useNavigate();
@@ -11,6 +16,13 @@ export default function SubscribePage() {
   const [phoneError, setPhoneError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const platform = detectPlatform();
+    if (platform === "ios") {
+      updateSmartBanner("/subscribe", getStoredAuthToken());
+    }
+  }, []);
 
   function validatePhoneNumber(phone: string): boolean {
     const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;

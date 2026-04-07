@@ -4,12 +4,24 @@ import { getContentList, getRubricList } from "../api/galaxy.ts";
 import type { ContentItem } from "../types/content.ts";
 import ContentCard from "../components/ContentCard.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import {
+  detectPlatform,
+  updateSmartBanner,
+  getStoredAuthToken,
+} from "../utils/deeplink.ts";
 
 export default function CategoryPage() {
   const { rubricId } = useParams<{ rubricId: string }>();
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const platform = detectPlatform();
+    if (platform === "ios" && rubricId) {
+      updateSmartBanner(`/category/${rubricId}`, getStoredAuthToken());
+    }
+  }, [rubricId]);
 
   useEffect(() => {
     if (!rubricId) return;
