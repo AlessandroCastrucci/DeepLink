@@ -16,7 +16,7 @@ export default function Toast({ message, onClose, duration = 3000 }: ToastProps)
   }, [duration, onClose]);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
       <div className="flex items-center gap-3 rounded-lg bg-dark-800 border border-accent-500/30 px-6 py-4 shadow-2xl backdrop-blur-sm">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-500/20">
           <svg
