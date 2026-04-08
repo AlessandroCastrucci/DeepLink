@@ -101,12 +101,11 @@ export default function LoginModal() {
 
   function handleQRLoginSuccess(userData: NonNullable<Awaited<ReturnType<typeof pollDeviceAuth>>["user"]>) {
     try {
-      //if (platform === "ios" ) {
         const user = userData
         setUser({
           user_id: user.id,
           authToken: user.token,
-          email: user.email ?? undefined,
+          email: user.email,
           firstname: undefined,
           lastname: undefined,
           nickname: undefined,
@@ -114,26 +113,6 @@ export default function LoginModal() {
           total_credit: undefined,
           dve_login: undefined,
           });
-      //} else {
-        /*if (userData.error !== 0 || !userData.data?.["0"]) {
-          setError("Échec de récupération des informations utilisateur");
-          return;
-          }
-        const user = userData.data["0"];
-        const authTokenEntry = user.token?.find((t) => t.content === "authtoken");
-        setUser({
-          user_id: user.user_id,
-          authToken: authTokenEntry?.token,
-          email: user.email ?? undefined,
-          firstname: user.firstname ?? undefined,
-          lastname: user.lastname ?? undefined,
-          nickname: user.nickname ?? undefined,
-          subscribed: user.subscribed,
-          total_credit: user.total_credit ? Number(user.total_credit) : undefined,
-          dve_login: user.dve_login ?? undefined,
-          });
-          */
-     // }
       closeLogin();
     } catch (err) {
       setError("Erreur lors de la connexion");
