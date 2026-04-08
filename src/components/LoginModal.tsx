@@ -12,6 +12,7 @@ type LoginMode = "password" | "qrcode";
 export default function LoginModal() {
   const navigate = useNavigate();
   const { showLogin, closeLogin, login, setUser } = useAuth();
+  const [platform] = useState(detectPlatform());
   const [loginMode, setLoginMode] = useState<LoginMode>("password");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +24,12 @@ export default function LoginModal() {
   const [qrCodeLoading, setQrCodeLoading] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const pollIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if ((platform === "ios" || platform === "android") && loginMode === "qrcode") {
+      setLoginMode("password");
+    }
+  }, [platform, loginMode]);
 
   useEffect(() => {
     async function initializeQRCode() {
@@ -205,32 +212,34 @@ export default function LoginModal() {
           </svg>
         </button>
 
-        <div className="mb-6 flex gap-2 rounded-lg bg-dark-700 p-1">
-          <button
-            type="button"
-            onClick={() => setLoginMode("password")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-              loginMode === "password"
-                ? "bg-accent-500 text-white shadow-md"
-                : "text-gray-400 hover:text-gray-300"
-            }`}
-          >
-            Mot de passe
-          </button>
-          <button
-            type="button"
-            onClick={() => setLoginMode("qrcode")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-              loginMode === "qrcode"
-                ? "bg-accent-500 text-white shadow-md"
-                : "text-gray-400 hover:text-gray-300"
-            }`}
-          >
-            Code QR
-          </button>
-        </div>
+        {platform !== "ios" && platform !== "android" && (
+          <div className="mb-6 flex gap-2 rounded-lg bg-dark-700 p-1">
+            <button
+              type="button"
+              onClick={() => setLoginMode("password")}
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+                loginMode === "password"
+                  ? "bg-accent-500 text-white shadow-md"
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              Mot de passe
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginMode("qrcode")}
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+                loginMode === "qrcode"
+                  ? "bg-accent-500 text-white shadow-md"
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              Code QR
+            </button>
+          </div>
+        )}
 
-        <div className="mb-7 text-center">
+        <div className={`text-center ${platform === "ios" || platform === "android" ? "mb-7 mt-6" : "mb-7"}`}>
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent-500/15 transition-transform hover:scale-105">
             {loginMode === "password" ? (
               <svg
