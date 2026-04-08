@@ -4,6 +4,7 @@ import { searchContent } from "../api/galaxy.ts";
 import type { ContentItem } from "../types/content.ts";
 import ContentCard from "../components/ContentCard.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import { useAuth } from "../context/AuthContext.tsx";
 import {
   detectPlatform,
   updateSmartBanner,
@@ -11,6 +12,7 @@ import {
 } from "../utils/deeplink.ts";
 
 export default function SearchPage() {
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [results, setResults] = useState<ContentItem[]>([]);
@@ -31,7 +33,8 @@ export default function SearchPage() {
     setLoading(true);
     setSearched(true);
     try {
-      const data = await searchContent(q.trim());
+      const authToken = user?.authToken;
+      const data = await searchContent(q.trim(), 1, undefined, authToken);
       setResults(data);
     } catch (err) {
       console.error("Search failed:", err);
@@ -39,7 +42,7 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const q = searchParams.get("q");

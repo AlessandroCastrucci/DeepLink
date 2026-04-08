@@ -56,17 +56,18 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
       setContent(null);
       setRelated([]);
       try {
-        const detail = await getContentDetail(contentId!);
+        const authToken = user?.authToken;
+        const detail = await getContentDetail(contentId!, undefined, authToken);
         if (cancelled) return;
         setContent(detail);
 
-        const rubrics = await getRubricList(RELATED_RUBRIC);
+        const rubrics = await getRubricList(RELATED_RUBRIC, undefined, authToken);
         if (cancelled) return;
 
         const validRubrics = rubrics.filter((r) => r.nb_content > 0);
         const rows = await Promise.all(
           validRubrics.slice(0, 5).map(async (rubric) => {
-            const contents = await getContentList(String(rubric.rubric_id));
+            const contents = await getContentList(String(rubric.rubric_id), undefined, authToken);
             return { rubric, contents } as CategoryRow;
           }),
         );
@@ -83,7 +84,7 @@ export default function ContentDetailPage({ overrideContentId }: Props = {}) {
     return () => {
       cancelled = true;
     };
-  }, [contentId]);
+  }, [contentId, user]);
 
   if (loading) return <LoadingSpinner />;
   if (!content) {

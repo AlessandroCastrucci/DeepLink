@@ -4,6 +4,7 @@ import { getContentList, getRubricList } from "../api/galaxy.ts";
 import type { ContentItem } from "../types/content.ts";
 import ContentCard from "../components/ContentCard.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
+import { useAuth } from "../context/AuthContext.tsx";
 import {
   detectPlatform,
   updateSmartBanner,
@@ -12,6 +13,7 @@ import {
 
 export default function CategoryPage() {
   const { rubricId } = useParams<{ rubricId: string }>();
+  const { user } = useAuth();
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
@@ -33,9 +35,10 @@ export default function CategoryPage() {
       setContents([]);
       setTitle("");
       try {
+        const authToken = user?.authToken;
         const [contentData, rubricData] = await Promise.all([
-          getContentList(rubricId!),
-          getRubricList(rubricId!),
+          getContentList(rubricId!, undefined, authToken),
+          getRubricList(rubricId!, undefined, authToken),
         ]);
         if (cancelled) return;
         setContents(contentData);
@@ -53,7 +56,7 @@ export default function CategoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [rubricId]);
+  }, [rubricId, user]);
 
   if (loading) return <LoadingSpinner />;
 
