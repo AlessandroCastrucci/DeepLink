@@ -101,7 +101,7 @@ export default function LoginModal() {
 
   function handleQRLoginSuccess(userData: NonNullable<Awaited<ReturnType<typeof pollDeviceAuth>>["user"]>) {
     try {
-      if (platform === "ios" ) {
+      //if (platform === "ios" ) {
         const user = userData
         setUser({
           user_id: user.id,
@@ -114,8 +114,8 @@ export default function LoginModal() {
           total_credit: undefined,
           dve_login: undefined,
           });
-      } else {
-        if (userData.error !== 0 || !userData.data?.["0"]) {
+      //} else {
+        /*if (userData.error !== 0 || !userData.data?.["0"]) {
           setError("Échec de récupération des informations utilisateur");
           return;
           }
@@ -132,7 +132,8 @@ export default function LoginModal() {
           total_credit: user.total_credit ? Number(user.total_credit) : undefined,
           dve_login: user.dve_login ?? undefined,
           });
-      }
+          */
+     // }
       closeLogin();
     } catch (err) {
       setError("Erreur lors de la connexion");
