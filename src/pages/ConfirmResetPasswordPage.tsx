@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import AppBanner from '../components/AppBanner.tsx';
 import Toast from '../components/Toast.tsx';
 import {
-  detectPlatform,
   buildResetPasswordPath,
   checkAppLinkAttempt,
   getStoreUrl,
@@ -55,7 +54,6 @@ export default function ConfirmResetPasswordPage() {
         return;
       }
 
-      const platform = detectPlatform();
       const resetPath = buildResetPasswordPath(username);
       const appLinkUrl = `${window.location.origin}${resetPath}`;
       window.location.href = appLinkUrl;
