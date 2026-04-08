@@ -54,9 +54,9 @@ export default function ThankYouPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
+    <div className="fixed inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 overflow-auto">
       <AppBanner />
-      <div className="flex min-h-screen items-center justify-center px-4 py-20">
+      <div className="flex min-h-full items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-lg">
           <div className="rounded-2xl bg-dark-800/80 p-6 shadow-2xl backdrop-blur-sm border border-dark-700 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/15">
