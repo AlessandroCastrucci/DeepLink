@@ -58,7 +58,7 @@ export default function ConfirmResetPasswordPage() {
       const platform = detectPlatform();
       const resetPath = buildResetPasswordPath(username);
 
-      if (true && platform === 'android') {
+      if (true || platform === 'android') {
         const appLinkUrl = `${window.location.origin}${resetPath}`;
 
         window.location.href = appLinkUrl;
