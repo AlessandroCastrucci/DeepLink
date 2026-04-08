@@ -108,7 +108,7 @@ export default function LoginModal() {
 
       const user = userData.data["0"];
       const authTokenEntry = user.token?.find((t) => t.content === "authtoken");
-
+      console.log(user)
       setUser({
         user_id: user.user_id,
         authToken: authTokenEntry?.token,
