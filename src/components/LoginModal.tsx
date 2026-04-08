@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
-import { detectPlatform, openResetPassword } from "../utils/deeplink.ts";
+import { detectPlatform } from "../utils/deeplink.ts";
 import { checkMsisdnExists } from "../api/kliento.ts";
 import { requestDeviceCode, pollDeviceAuth, buildPairingDeeplink } from "../api/deviceAuth.ts";
 import QRCode from "qrcode";
@@ -104,7 +104,8 @@ export default function LoginModal() {
         const user = userData
         setUser({
           user_id: user.id,
-          email: user.email
+          email: user.email, 
+          subscribed: user.subscribed
         });
       closeLogin();
     } catch (err) {
