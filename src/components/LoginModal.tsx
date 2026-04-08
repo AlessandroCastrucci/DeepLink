@@ -171,13 +171,13 @@ export default function LoginModal() {
       const platform = detectPlatform();
       closeLogin();
 
-      if (platform === "android") {
+      //if (platform === "android") {
         navigate(`/confirm-reset-password?username=${encodeURIComponent(username)}`);
-      } else if (platform === "ios") {
-        openResetPassword(username);
-      } else {
-        navigate(`/reset-password?username=${encodeURIComponent(username)}`);
-      }
+      //} else if (platform === "ios") {
+      //  openResetPassword(username);
+     // } else {
+      //  navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      //}
     } catch {
       setError("Erreur lors de la vérification. Veuillez réessayer.");
     } finally {
