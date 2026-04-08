@@ -106,13 +106,8 @@ export default function LoginModal() {
           user_id: user.id,
           authToken: user.token,
           email: user.email,
-          firstname: undefined,
-          lastname: undefined,
-          nickname: undefined,
-          subscribed: user.subscribed,
-          total_credit: undefined,
-          dve_login: undefined,
-          });
+          subscribed: user.subscribed
+        });
       closeLogin();
     } catch (err) {
       setError("Erreur lors de la connexion");
