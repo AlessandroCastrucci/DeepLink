@@ -105,7 +105,7 @@ export default function LoginModal() {
         setUser({
           user_id: user.id,
           authToken: user.token,
-          email: user.email, 
+          email: user.email ?? undefined, 
           subscribed: user.subscribed
         });
       closeLogin();
