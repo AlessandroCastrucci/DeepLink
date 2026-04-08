@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { ContentItem } from "../types/content.ts";
 import { getCoverImage } from "../utils/assets.ts";
+import { useAuth } from "../context/AuthContext.tsx";
 
 interface ContentCardProps {
   content: ContentItem;
@@ -14,10 +15,14 @@ export default function ContentCard({
   fluid = false,
 }: ContentCardProps) {
   const coverUrl = getCoverImage(content.assets);
+  const { user } = useAuth();
+  const contentPath = user?.authToken
+    ? `/content/${content.content_id}?authtoken=${encodeURIComponent(user.authToken)}`
+    : `/content/${content.content_id}`;
 
   return (
     <Link
-      to={`/content/${content.content_id}`}
+      to={contentPath}
       className={`group relative flex-shrink-0 overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105 ${
         fluid ? "w-full" : ""
       }`}

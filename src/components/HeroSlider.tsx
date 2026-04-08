@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ContentItem } from "../types/content.ts";
 import { getHighlight, getHighlightTitle, formatDuration } from "../utils/assets.ts";
+import { useAuth } from "../context/AuthContext.tsx";
 interface HeroSliderProps {
   items: ContentItem[];
 }
@@ -9,6 +10,7 @@ interface HeroSliderProps {
 export default function HeroSlider({ items }: HeroSliderProps) {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
+  const { user } = useAuth();
   const heroItems = items.filter((i) => getHighlight(i.assets)).slice(0, 6);
 
   const next = useCallback(() => {
@@ -85,7 +87,10 @@ export default function HeroSlider({ items }: HeroSliderProps) {
 
           <button
             onClick={() => {
-              navigate(`/content/${item.content_id}`);
+              const path = user?.authToken
+                ? `/content/${item.content_id}?authtoken=${encodeURIComponent(user.authToken)}`
+                : `/content/${item.content_id}`;
+              navigate(path);
             }}
             className="mt-1 inline-flex w-fit items-center gap-2 rounded-lg bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
           >
