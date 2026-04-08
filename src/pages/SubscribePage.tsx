@@ -60,7 +60,10 @@ export default function SubscribePage() {
       const userInfo = await getAccountInfo(result.userId);
       if (userInfo) {
         setUser(userInfo);
-        navigate("/thank-you");
+        const thankyouPath = userInfo.authToken
+          ? `/thank-you?authtoken=${encodeURIComponent(userInfo.authToken)}`
+          : '/thank-you';
+        navigate(thankyouPath);
       } else {
         setError("Erreur lors de la récupération des informations du compte.");
         setLoading(false);

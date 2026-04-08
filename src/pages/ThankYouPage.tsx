@@ -1,5 +1,5 @@
 import { useAuth } from "../context/AuthContext.tsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AppBanner from "../components/AppBanner.tsx";
 import {
@@ -18,6 +18,7 @@ import {
 export default function ThankYouPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [platform, setPlatform] = useState<Platform>("desktop");
 
   useEffect(() => {
@@ -25,20 +26,23 @@ export default function ThankYouPage() {
     setPlatform(detectedPlatform);
 
     if (detectedPlatform === "ios") {
-      updateSmartBanner('/thank-you', getStoredAuthToken());
+      const authToken = searchParams.get("authtoken") || getStoredAuthToken();
+      const path = authToken ? `/thank-you?authtoken=${encodeURIComponent(authToken)}` : '/thank-you';
+      updateSmartBanner(path, authToken);
     }
 
     const attempt = checkAppLinkAttempt();
     if (attempt && attempt.platform !== "ios") {
       window.location.href = getStoreUrl(attempt.platform, attempt.referrer);
     }
-  }, []);
+  }, [searchParams]);
 
   function handleOpenApp() {
     if (!user) return;
 
-    const referrer = buildReferrer({ authToken: user.authToken });
-    const appPath = buildDeepLinkPath(undefined, user.authToken);
+    const authToken = searchParams.get("authtoken") || user.authToken;
+    const referrer = buildReferrer({ authToken });
+    const appPath = buildDeepLinkPath(undefined, authToken);
 
     markAppLinkAttempt(platform, referrer);
     window.location.href = buildAppLinkUrl(appPath);
