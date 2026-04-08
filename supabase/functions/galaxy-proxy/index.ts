@@ -25,29 +25,24 @@ Deno.serve(async (req: Request) => {
     const search = url.searchParams.get("search") || "";
     const page = url.searchParams.get("page") || "1";
     const itemsPerPage = url.searchParams.get("itemsPerPage") || "20";
-    const authToken = url.searchParams.get("authtoken") || "";
 
     let apiUrl = "";
 
     switch (action) {
       case "rubric-list":
         apiUrl = `${BASE_URL}/publishing-rubric-list?api_key=${API_KEY}&api_secret_key=${API_SECRET}&country_code=fr&language_code=fr&campaign_id=${campaignId}&rubric_id=${rubricId}`;
-        if (authToken) apiUrl += `&authtoken=${encodeURIComponent(authToken)}`;
         break;
 
       case "content-list":
         apiUrl = `${BASE_URL}/publishing-content-list?api_key=${API_KEY}&api_secret_key=${API_SECRET}&country_code=fr&language_code=fr&campaign_id=${campaignId}&rubric_id=${rubricId}&preview=true&asset=true&delivery=true`;
-        if (authToken) apiUrl += `&authtoken=${encodeURIComponent(authToken)}`;
         break;
 
       case "content-detail":
         apiUrl = `${BASE_URL}/publishing-content-detail?api_key=${API_KEY}&api_secret_key=${API_SECRET}&country_code=fr&language_code=fr&campaign_id=${campaignId}&content_id=${contentId}&preview=true&asset=true&delivery=true`;
-        if (authToken) apiUrl += `&authtoken=${encodeURIComponent(authToken)}`;
         break;
 
       case "search":
         apiUrl = `${BASE_URL}/publishing-content-list?content_title=${encodeURIComponent(search)}&content_type=html&preview=true&asset=true&delivery=true&without_token=true&itemsPerPage=${itemsPerPage}&page=${page}&api_key=${API_KEY}&api_secret_key=${API_SECRET}&country_code=fr&language_code=fr&campaign_id=${campaignId}`;
-        if (authToken) apiUrl += `&authtoken=${encodeURIComponent(authToken)}`;
         break;
 
       default:

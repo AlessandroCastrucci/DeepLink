@@ -29,45 +29,36 @@ function extractData(json: unknown): unknown[] {
 export async function getRubricList(
   rubricId: string,
   campaignId = DEFAULT_CAMPAIGN,
-  authToken?: string,
 ): Promise<RubricItem[]> {
-  const params: Record<string, string> = {
+  const json = await proxyFetch({
     action: "rubric-list",
     campaign_id: campaignId,
     rubric_id: rubricId,
-  };
-  if (authToken) params.authtoken = authToken;
-  const json = await proxyFetch(params);
+  });
   return extractData(json) as RubricItem[];
 }
 
 export async function getContentList(
   rubricId: string,
   campaignId = DEFAULT_CAMPAIGN,
-  authToken?: string,
 ): Promise<ContentItem[]> {
-  const params: Record<string, string> = {
+  const json = await proxyFetch({
     action: "content-list",
     campaign_id: campaignId,
     rubric_id: rubricId,
-  };
-  if (authToken) params.authtoken = authToken;
-  const json = await proxyFetch(params);
+  });
   return extractData(json) as ContentItem[];
 }
 
 export async function getContentDetail(
   contentId: string,
   campaignId = DEFAULT_CAMPAIGN,
-  authToken?: string,
 ): Promise<ContentItem | null> {
-  const params: Record<string, string> = {
+  const json = await proxyFetch({
     action: "content-detail",
     campaign_id: campaignId,
     content_id: contentId,
-  };
-  if (authToken) params.authtoken = authToken;
-  const json = await proxyFetch(params);
+  });
   const items = extractData(json) as ContentItem[];
   return items[0] ?? null;
 }
@@ -76,16 +67,13 @@ export async function searchContent(
   query: string,
   page = 1,
   campaignId = DEFAULT_CAMPAIGN,
-  authToken?: string,
 ): Promise<ContentItem[]> {
-  const params: Record<string, string> = {
+  const json = await proxyFetch({
     action: "search",
     campaign_id: campaignId,
     search: query,
     page: String(page),
     itemsPerPage: "20",
-  };
-  if (authToken) params.authtoken = authToken;
-  const json = await proxyFetch(params);
+  });
   return extractData(json) as ContentItem[];
 }

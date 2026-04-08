@@ -4,7 +4,6 @@ import type { ContentItem, CategoryRow } from "../types/content.ts";
 import HeroSlider from "../components/HeroSlider.tsx";
 import ContentRow from "../components/ContentRow.tsx";
 import LoadingSpinner from "../components/LoadingSpinner.tsx";
-import { useAuth } from "../context/AuthContext.tsx";
 import {
   detectPlatform,
   updateSmartBanner,
@@ -16,7 +15,6 @@ const CATEGORY_RUBRICS =
   "273536,268860,295883,287837,294356,291318,287839,287838,287840,268858,268859,268857,270101,273535,268866,273694,283300,268844,268850,268845";
 
 export default function HomePage() {
-  const { user } = useAuth();
   const [heroItems, setHeroItems] = useState<ContentItem[]>([]);
   const [rows, setRows] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,12 +31,11 @@ export default function HomePage() {
 
     async function load() {
       try {
-        const authToken = user?.authToken;
-        const highlighted = await getContentList(HIGHLIGHT_RUBRIC, undefined, authToken);
+        const highlighted = await getContentList(HIGHLIGHT_RUBRIC);
         if (cancelled) return;
         setHeroItems(highlighted);
 
-        const rubrics = await getRubricList(CATEGORY_RUBRICS, undefined, authToken);
+        const rubrics = await getRubricList(CATEGORY_RUBRICS);
         if (cancelled) return;
 
         const validRubrics = rubrics.filter((r) => r.nb_content > 0);
@@ -48,7 +45,7 @@ export default function HomePage() {
           const batch = validRubrics.slice(i, i + batchSize);
           const results = await Promise.all(
             batch.map(async (rubric) => {
-              const contents = await getContentList(String(rubric.rubric_id), undefined, authToken);
+              const contents = await getContentList(String(rubric.rubric_id));
               return { rubric, contents } as CategoryRow;
             }),
           );
@@ -66,7 +63,7 @@ export default function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, []);
 
   if (loading && heroItems.length === 0) return <LoadingSpinner />;
 
