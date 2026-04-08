@@ -86,28 +86,26 @@ export default function ThankYouPage() {
             </p>
 
             <div className="space-y-4">
-              {platform !== "ios" && (
-                <button
-                  onClick={handleOpenApp}
-                  className="w-full flex items-center justify-center gap-3 rounded-lg bg-accent-500 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98]"
+              <button
+                onClick={handleOpenApp}
+                className="w-full flex items-center justify-center gap-3 rounded-lg bg-accent-500 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-accent-500/25 transition-all hover:bg-accent-600 hover:shadow-accent-500/40 active:scale-[0.98]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                  Ouvrir l'application
-                </button>
-              )}
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                Ouvrir l'application
+              </button>
 
               <button
                 onClick={() => navigate("/")}
