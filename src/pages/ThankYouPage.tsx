@@ -56,7 +56,7 @@ export default function ThankYouPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
       <AppBanner />
-      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className={`flex min-h-screen items-center justify-center px-4 ${platform === "ios" ? "pt-32 pb-12" : "py-12"}`}>
         <div className="w-full max-w-lg">
           <div className="rounded-2xl bg-dark-800/80 p-8 shadow-2xl backdrop-blur-sm border border-dark-700 text-center">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/15">
