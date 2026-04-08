@@ -57,27 +57,19 @@ export default function ConfirmResetPasswordPage() {
 
       const platform = detectPlatform();
       const resetPath = buildResetPasswordPath(username);
-
-      if (platform === 'android') {
-        const appLinkUrl = `${window.location.origin}${resetPath}`;
-
-        window.location.href = appLinkUrl;
-
-        let didLeave = false;
-        const onVisibilityChange = () => {
-          if (document.hidden) didLeave = true;
-        };
-        document.addEventListener('visibilitychange', onVisibilityChange);
-
-        setTimeout(() => {
-          document.removeEventListener('visibilitychange', onVisibilityChange);
-          if (!didLeave) {
-            navigate(`/reset-password?username=${encodeURIComponent(username)}`);
+      const appLinkUrl = `${window.location.origin}${resetPath}`;
+      window.location.href = appLinkUrl;
+      let didLeave = false;
+      const onVisibilityChange = () => {
+        if (document.hidden) didLeave = true;
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      setTimeout(() => {
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        if (!didLeave) {
+          navigate(`/reset-password?username=${encodeURIComponent(username)}`);
           }
         }, 3000);
-      } else {
-        navigate(`/reset-password?username=${encodeURIComponent(username)}`);
-      }
     } catch {
       setError('Erreur lors de la vérification. Veuillez réessayer.');
       setLoading(false);
