@@ -153,8 +153,6 @@ export default function LoginModal() {
         setUsernameError("Cet identifiant n'existe pas");
         return;
       }
-
-      const platform = detectPlatform();
       closeLogin();
       navigate(`/confirm-reset-password?username=${encodeURIComponent(username)}`);
     } catch {
