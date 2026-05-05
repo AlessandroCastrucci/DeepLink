@@ -31,8 +31,12 @@ export type AppBannerOptions = {
    * substituted in the URL; otherwise `?package=…&size=…` is appended.
    */
   iconResolverUrl?: string;
-  /** Hide banner after dismiss for this many days (default 7). */
-  dismissDays: number;
+  /**
+   * How long to keep the banner dismissed (default `7d`). Accepts a number of
+   * milliseconds or a duration string like `30s`, `15m`, `2h`, `7d`. If `0`
+   * (or `"0"`), the banner is not persisted and reappears on next load.
+   */
+  dismissDuration: number | string;
   /** If true (default), only render when the user agent looks like Android. */
   showAndroidOnly: boolean;
   openButtonText: string;
@@ -45,7 +49,7 @@ export type AppBannerOptions = {
 
 const DEFAULTS: Omit<AppBannerOptions, "packageName" | "deepLink" | "title"> = {
   description: "Get the app for the best experience.",
-  dismissDays: 7,
+  dismissDuration: "7d",
   showAndroidOnly: true,
   openButtonText: "Open",
   theme: "auto",
@@ -102,7 +106,7 @@ export function parseOptionsFromScript(el: HTMLScriptElement): AppBannerOptions 
     description: ds.description ?? DEFAULTS.description,
     iconUrl: ds.icon,
     iconResolverUrl: ds.iconResolver,
-    dismissDays: readNumber(ds.dismissDays, DEFAULTS.dismissDays),
+    dismissDuration: ds.dismissDuration ?? ds.dismissDays ?? DEFAULTS.dismissDuration,
     showAndroidOnly: readBool(ds.showAndroidOnly, DEFAULTS.showAndroidOnly),
     openButtonText: ds.openButtonText ?? DEFAULTS.openButtonText,
     theme: readTheme(ds.theme),
@@ -131,7 +135,7 @@ export function createBannerOptions(
     playStoreReferrer: partial.playStoreReferrer,
     iconUrl: partial.iconUrl,
     iconResolverUrl: partial.iconResolverUrl,
-    dismissDays: partial.dismissDays ?? DEFAULTS.dismissDays,
+    dismissDuration: partial.dismissDuration ?? DEFAULTS.dismissDuration,
     showAndroidOnly: partial.showAndroidOnly ?? DEFAULTS.showAndroidOnly,
     openButtonText: partial.openButtonText ?? DEFAULTS.openButtonText,
     theme: partial.theme ?? DEFAULTS.theme,

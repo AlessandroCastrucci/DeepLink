@@ -1,9 +1,9 @@
 function N(e, n) {
-  const s = `https://play.google.com/store/apps/details?id=${encodeURIComponent(e)}`;
-  return n != null && n !== "" ? `${s}&referrer=${encodeURIComponent(n)}` : s;
+  const c = `https://play.google.com/store/apps/details?id=${encodeURIComponent(e)}`;
+  return n != null && n !== "" ? `${c}&referrer=${encodeURIComponent(n)}` : c;
 }
-function M(e) {
-  const { deepLink: n, packageName: t, playStoreUrl: s } = e;
+function B(e) {
+  const { deepLink: n, packageName: t, playStoreUrl: c } = e;
   let r;
   try {
     r = new URL(n, typeof window < "u" ? window.location.href : void 0);
@@ -13,17 +13,17 @@ function M(e) {
   const d = r.protocol.replace(/:$/, "");
   if (!d)
     throw new Error("app-banner: deepLink must include a scheme (e.g. https://)");
-  const o = r.host ? `${r.host}${r.pathname}${r.search}${r.hash}` : `${r.pathname.replace(/^\//, "")}${r.search}${r.hash}`, c = encodeURIComponent(s);
-  return `intent://${o}#Intent;scheme=${d};package=${t};S.browser_fallback_url=${c};end`;
+  const o = r.host ? `${r.host}${r.pathname}${r.search}${r.hash}` : `${r.pathname.replace(/^\//, "")}${r.search}${r.hash}`, p = encodeURIComponent(c);
+  return `intent://${o}#Intent;scheme=${d};package=${t};S.browser_fallback_url=${p};end`;
 }
-const I = "app-banner-styles";
-function $(e) {
+const C = "app-banner-styles";
+function I(e) {
   return e === "light" || e === "dark" ? e : typeof window > "u" || !window.matchMedia ? "light" : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 function z() {
-  if (typeof document > "u" || document.getElementById(I)) return;
+  if (typeof document > "u" || document.getElementById(C)) return;
   const e = document.createElement("style");
-  e.id = I, e.textContent = `
+  e.id = C, e.textContent = `
 .app-banner-host {
   --app-banner-bg-light: rgba(248, 248, 248, 0.94);
   --app-banner-bg-dark: rgba(28, 28, 30, 0.94);
@@ -131,16 +131,16 @@ function z() {
 }
 `, document.head.appendChild(e);
 }
-function R(e) {
+function A(e) {
   return `app-banner:${e}`;
 }
-function K(e, n, t = 192) {
+function _(e, n, t = 192) {
   if (e.includes("{package}") || e.includes("{size}"))
     return e.replace(/\{package\}/g, encodeURIComponent(n)).replace(/\{size\}/g, String(t));
   const r = e.includes("?") ? "&" : "?";
   return `${e}${r}package=${encodeURIComponent(n)}&size=${t}`;
 }
-const _ = 7 * 864e5;
+const K = 7 * 864e5;
 function j(e) {
   try {
     const n = localStorage.getItem(`app-banner:icon:${e}`);
@@ -155,7 +155,7 @@ function J(e, n) {
   try {
     localStorage.setItem(
       `app-banner:icon:${e}`,
-      JSON.stringify({ url: n, until: Date.now() + _ })
+      JSON.stringify({ url: n, until: Date.now() + K })
     );
   } catch {
   }
@@ -164,11 +164,11 @@ async function H(e, n) {
   const t = j(n);
   if (t) return t;
   try {
-    const s = await fetch(K(e, n), {
+    const c = await fetch(_(e, n), {
       headers: { Accept: "application/json" }
     });
-    if (!s.ok) return null;
-    const r = await s.json();
+    if (!c.ok) return null;
+    const r = await c.json();
     return r.iconUrl ? (J(n, r.iconUrl), r.iconUrl) : null;
   } catch {
     return null;
@@ -176,7 +176,7 @@ async function H(e, n) {
 }
 function G(e) {
   try {
-    const n = localStorage.getItem(R(e.storageKey));
+    const n = localStorage.getItem(A(e.storageKey));
     if (!n) return !1;
     const t = JSON.parse(n);
     return !(!t.until || Date.now() > t.until);
@@ -184,21 +184,40 @@ function G(e) {
     return !1;
   }
 }
-function V(e) {
-  const n = Date.now() + e.dismissDays * 864e5;
+const V = /^\s*(\d+(?:\.\d+)?)\s*(ms|s|m|h|d)?\s*$/i, Y = {
+  ms: 1,
+  s: 1e3,
+  m: 6e4,
+  h: 36e5,
+  d: 864e5
+};
+function Q(e) {
+  if (e == null) return 0;
+  if (typeof e == "number") return Number.isFinite(e) && e > 0 ? e : 0;
+  const n = V.exec(e);
+  if (!n) return 0;
+  const t = Number(n[1]);
+  if (!Number.isFinite(t) || t <= 0) return 0;
+  const c = (n[2] ?? "ms").toLowerCase();
+  return t * (Y[c] ?? 1);
+}
+function W(e) {
+  const n = Q(e.dismissDuration);
+  if (n <= 0) return;
+  const t = Date.now() + n;
   try {
-    localStorage.setItem(R(e.storageKey), JSON.stringify({ until: n }));
+    localStorage.setItem(A(e.storageKey), JSON.stringify({ until: t }));
   } catch {
   }
 }
 function O(e) {
-  var C;
+  var L;
   z();
   const n = document.createElement("div");
   n.className = "app-banner-host", n.setAttribute("role", "region"), n.setAttribute("aria-label", "App install banner");
   const t = e.topInsetPx ?? 0;
   t > 0 && (n.style.top = `${t}px`);
-  const r = $(e.theme) === "dark";
+  const r = I(e.theme) === "dark";
   n.style.setProperty("--app-banner-bg", r ? "var(--app-banner-bg-dark)" : "var(--app-banner-bg-light)"), n.style.setProperty("--app-banner-text", r ? "var(--app-banner-text-dark)" : "var(--app-banner-text-light)"), n.style.setProperty(
     "--app-banner-muted-text",
     r ? "var(--app-banner-muted-dark)" : "var(--app-banner-muted-light)"
@@ -210,21 +229,21 @@ function O(e) {
   d.className = "app-banner-inner";
   const o = document.createElement("img");
   o.className = "app-banner-icon", o.alt = "", o.referrerPolicy = "no-referrer";
-  const c = document.createElement("div");
-  c.className = "app-banner-icon app-banner-icon--placeholder", c.textContent = e.title.trim().charAt(0).toUpperCase() || "A", o.addEventListener("error", () => {
-    o.parentNode && o.parentNode.replaceChild(c, o);
+  const p = document.createElement("div");
+  p.className = "app-banner-icon app-banner-icon--placeholder", p.textContent = e.title.trim().charAt(0).toUpperCase() || "A", o.addEventListener("error", () => {
+    o.parentNode && o.parentNode.replaceChild(p, o);
   });
   let k;
-  e.iconUrl ? (o.src = e.iconUrl, k = o) : e.iconResolverUrl ? (k = c, H(e.iconResolverUrl, e.packageName).then((a) => {
-    a && (o.src = a, c.parentNode && c.parentNode.replaceChild(o, c));
+  e.iconUrl ? (o.src = e.iconUrl, k = o) : e.iconResolverUrl ? (k = p, H(e.iconResolverUrl, e.packageName).then((a) => {
+    a && (o.src = a, p.parentNode && p.parentNode.replaceChild(o, p));
   }).catch(() => {
-  })) : k = c;
+  })) : k = p;
   const x = document.createElement("div");
   x.className = "app-banner-text";
-  const v = document.createElement("p");
-  v.className = "app-banner-title", v.textContent = e.title;
   const w = document.createElement("p");
-  w.className = "app-banner-desc", w.textContent = e.description, x.append(v, w);
+  w.className = "app-banner-title", w.textContent = e.title;
+  const v = document.createElement("p");
+  v.className = "app-banner-desc", v.textContent = e.description, x.append(w, v);
   const E = document.createElement("div");
   E.className = "app-banner-actions";
   const h = document.createElement("button");
@@ -232,15 +251,15 @@ function O(e) {
   const m = document.createElement("button");
   m.type = "button", m.className = "app-banner-close", m.setAttribute("aria-label", "Dismiss"), m.innerHTML = "×";
   let g = 0, y = null;
-  function S() {
+  function U() {
     g !== 0 && (window.clearTimeout(g), g = 0), y && (document.removeEventListener("visibilitychange", y), y = null);
   }
-  function D() {
+  function P() {
     return e.playStoreUrl ?? N(e.packageName, e.playStoreReferrer);
   }
   h.addEventListener("click", () => {
-    S();
-    const a = D(), b = M({
+    U();
+    const a = P(), b = B({
       deepLink: e.deepLink,
       packageName: e.packageName,
       playStoreUrl: a
@@ -255,23 +274,23 @@ function O(e) {
       document.removeEventListener("visibilitychange", u), y = null, g = 0, f || window.location.assign(a);
     }, e.openFallbackTimeoutMs);
   });
-  const U = () => {
-    S(), n.remove();
+  const S = () => {
+    U(), n.remove();
     const a = document.documentElement, b = a.style.paddingTop;
     b && b.includes("px") && (a.style.paddingTop = "");
   };
   m.addEventListener("click", () => {
-    V(e), U();
+    W(e), S();
   }), E.append(h, m), d.append(k, x, E), n.append(d);
-  const B = () => n.getBoundingClientRect().height, L = () => {
-    const a = B();
+  const M = () => n.getBoundingClientRect().height, T = () => {
+    const a = M();
     document.documentElement.style.paddingTop = `${t + a}px`;
   };
-  document.body.appendChild(n), L();
-  const l = typeof ResizeObserver < "u" ? new ResizeObserver(() => L()) : null;
+  document.body.appendChild(n), T();
+  const l = typeof ResizeObserver < "u" ? new ResizeObserver(() => T()) : null;
   if (l == null || l.observe(n), e.theme === "auto" && window.matchMedia) {
     const a = window.matchMedia("(prefers-color-scheme: dark)"), b = () => {
-      const u = $("auto") === "dark";
+      const u = I("auto") === "dark";
       n.style.setProperty("--app-banner-bg", u ? "var(--app-banner-bg-dark)" : "var(--app-banner-bg-light)"), n.style.setProperty("--app-banner-text", u ? "var(--app-banner-text-dark)" : "var(--app-banner-text-light)"), n.style.setProperty(
         "--app-banner-muted-text",
         u ? "var(--app-banner-muted-dark)" : "var(--app-banner-muted-light)"
@@ -280,63 +299,63 @@ function O(e) {
         u ? "var(--app-banner-border-dark)" : "var(--app-banner-border-light)"
       );
     };
-    return (C = a.addEventListener) == null || C.call(a, "change", b), () => {
+    return (L = a.addEventListener) == null || L.call(a, "change", b), () => {
       var f;
-      (f = a.removeEventListener) == null || f.call(a, "change", b), l == null || l.disconnect(), U();
+      (f = a.removeEventListener) == null || f.call(a, "change", b), l == null || l.disconnect(), S();
     };
   }
   return () => {
-    S(), l == null || l.disconnect(), U();
+    U(), l == null || l.disconnect(), S();
   };
 }
-function P(e) {
+function D(e) {
   return !(e.showAndroidOnly && typeof navigator < "u" && !/Android/i.test(navigator.userAgent) || G(e));
 }
 const i = {
   description: "Get the app for the best experience.",
-  dismissDays: 7,
+  dismissDuration: "7d",
   showAndroidOnly: !0,
   openButtonText: "Open",
   theme: "auto",
   openFallbackEnabled: !0,
   openFallbackTimeoutMs: 3e3
 };
-function A(e, n) {
+function $(e, n) {
   return e === void 0 || e === "" ? n : e === "1" || e.toLowerCase() === "true" || e.toLowerCase() === "yes";
 }
-function T(e, n) {
+function F(e, n) {
   if (e === void 0 || e === "") return n;
   const t = Number(e);
   return Number.isFinite(t) ? t : n;
 }
-function Y(e) {
+function X(e) {
   return e === "light" || e === "dark" || e === "auto" ? e : i.theme;
 }
-function Q(e) {
+function Z(e) {
   const n = e.dataset, t = n.package ?? "";
   if (!t)
     return console.warn("app-banner: missing data-package on script tag"), null;
-  const s = n.deepLink ?? (typeof window < "u" ? window.location.href : "https://localhost/"), r = n.title ?? "App", d = n.playStoreUrl, o = n.playReferrer, c = d ?? N(t, o);
+  const c = n.deepLink ?? (typeof window < "u" ? window.location.href : "https://localhost/"), r = n.title ?? "App", d = n.playStoreUrl, o = n.playReferrer, p = d ?? N(t, o);
   return {
     packageName: t,
-    deepLink: s,
-    playStoreUrl: c,
+    deepLink: c,
+    playStoreUrl: p,
     playStoreReferrer: o,
-    openFallbackEnabled: A(n.openFallbackEnabled, i.openFallbackEnabled),
-    openFallbackTimeoutMs: T(n.openFallbackTimeoutMs, i.openFallbackTimeoutMs),
+    openFallbackEnabled: $(n.openFallbackEnabled, i.openFallbackEnabled),
+    openFallbackTimeoutMs: F(n.openFallbackTimeoutMs, i.openFallbackTimeoutMs),
     title: r,
     description: n.description ?? i.description,
     iconUrl: n.icon,
     iconResolverUrl: n.iconResolver,
-    dismissDays: T(n.dismissDays, i.dismissDays),
-    showAndroidOnly: A(n.showAndroidOnly, i.showAndroidOnly),
+    dismissDuration: n.dismissDuration ?? n.dismissDays ?? i.dismissDuration,
+    showAndroidOnly: $(n.showAndroidOnly, i.showAndroidOnly),
     openButtonText: n.openButtonText ?? i.openButtonText,
-    theme: Y(n.theme),
+    theme: X(n.theme),
     storageKey: n.storageKey ?? t,
-    topInsetPx: T(n.topInset, 0) || void 0
+    topInsetPx: F(n.topInset, 0) || void 0
   };
 }
-function X(e) {
+function ee(e) {
   const n = e.playStoreUrl ?? N(e.packageName, e.playStoreReferrer);
   return {
     packageName: e.packageName,
@@ -347,7 +366,7 @@ function X(e) {
     playStoreReferrer: e.playStoreReferrer,
     iconUrl: e.iconUrl,
     iconResolverUrl: e.iconResolverUrl,
-    dismissDays: e.dismissDays ?? i.dismissDays,
+    dismissDuration: e.dismissDuration ?? i.dismissDuration,
     showAndroidOnly: e.showAndroidOnly ?? i.showAndroidOnly,
     openButtonText: e.openButtonText ?? i.openButtonText,
     theme: e.theme ?? i.theme,
@@ -357,31 +376,31 @@ function X(e) {
     topInsetPx: e.topInsetPx
   };
 }
-let p;
-function Z(e) {
-  return p == null || p(), P(e) ? (p = O(e), () => {
-    p == null || p(), p = void 0;
-  }) : (p = void 0, () => {
+let s;
+function ne(e) {
+  return s == null || s(), D(e) ? (s = O(e), () => {
+    s == null || s(), s = void 0;
+  }) : (s = void 0, () => {
   });
 }
-function W() {
+function q() {
   if (typeof document > "u") return null;
   const e = document.currentScript;
   if (e != null && e.hasAttribute("data-app-banner")) return e;
   const n = document.querySelectorAll("script[data-app-banner]");
   return n.length ? n[n.length - 1] : null;
 }
-function F() {
-  const e = W();
+function R() {
+  const e = q();
   if (!e) return;
-  const n = Q(e);
-  n && P(n) && (p == null || p(), p = O(n));
+  const n = Z(e);
+  n && D(n) && (s == null || s(), s = O(n));
 }
-typeof window < "u" && (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => F(), { once: !0 }) : queueMicrotask(() => F()));
+typeof window < "u" && (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => R(), { once: !0 }) : queueMicrotask(() => R()));
 export {
-  M as buildIntentUri,
+  B as buildIntentUri,
   N as buildPlayStoreUrl,
-  X as createBannerOptions,
-  Z as mountAppBanner
+  ee as createBannerOptions,
+  ne as mountAppBanner
 };
 //# sourceMappingURL=app-banner.js.map

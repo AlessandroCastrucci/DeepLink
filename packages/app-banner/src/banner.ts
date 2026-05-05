@@ -196,8 +196,30 @@ function isDismissed(options: AppBannerOptions): boolean {
   }
 }
 
+const DURATION_RE = /^\s*(\d+(?:\.\d+)?)\s*(ms|s|m|h|d)?\s*$/i;
+const UNIT_MS: Record<string, number> = {
+  ms: 1,
+  s: 1000,
+  m: 60000,
+  h: 3600000,
+  d: 86400000,
+};
+
+function parseDurationMs(value: number | string | undefined): number {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === "number") return Number.isFinite(value) && value > 0 ? value : 0;
+  const match = DURATION_RE.exec(value);
+  if (!match) return 0;
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  const unit = (match[2] ?? "ms").toLowerCase();
+  return amount * (UNIT_MS[unit] ?? 1);
+}
+
 function rememberDismiss(options: AppBannerOptions): void {
-  const until = Date.now() + options.dismissDays * 86400000;
+  const ttl = parseDurationMs(options.dismissDuration);
+  if (ttl <= 0) return;
+  const until = Date.now() + ttl;
   try {
     localStorage.setItem(storageKeyFull(options.storageKey), JSON.stringify({ until }));
   } catch {

@@ -28,8 +28,12 @@ export type AppBannerOptions = {
      * substituted in the URL; otherwise `?package=…&size=…` is appended.
      */
     iconResolverUrl?: string;
-    /** Hide banner after dismiss for this many days (default 7). */
-    dismissDays: number;
+    /**
+     * How long to keep the banner dismissed (default `7d`). Accepts a number of
+     * milliseconds or a duration string like `30s`, `15m`, `2h`, `7d`. If `0`
+     * (or `"0"`), the banner is not persisted and reappears on next load.
+     */
+    dismissDuration: number | string;
     /** If true (default), only render when the user agent looks like Android. */
     showAndroidOnly: boolean;
     openButtonText: string;
