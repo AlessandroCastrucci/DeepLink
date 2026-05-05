@@ -47,7 +47,7 @@ export default function AndroidAppBanner() {
         openFallbackTimeoutMs: 3000,
         topInsetPx: HEADER_HEIGHT_PX,
         openButtonText: "Ouvrir",
-        dismissDuration: "7d",
+        dismissDuration: "0",
       }),
     );
 
