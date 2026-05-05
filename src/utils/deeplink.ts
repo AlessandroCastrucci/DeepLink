@@ -1,6 +1,6 @@
 const ANDROID_PACKAGE = "com.virgoplay.playvod.af";
-const IOS_SMART_BANNER_APP_ID = "1541831663";
-export const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_SMART_BANNER_APP_ID}`;
+const IOS_APP_STORE_ID = "1210318173";
+export const IOS_APP_STORE_URL = `https://apps.apple.com/app/playvod/id${IOS_APP_STORE_ID}`;
 export const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
 const APP_LINK_ATTEMPT_KEY = "app_link_attempt";
@@ -171,7 +171,7 @@ export function updateSmartBanner(currentPath: string, authToken?: string): void
       : `${window.location.origin}${currentPath}`;
     meta.setAttribute(
       "content",
-      `app-id=${IOS_SMART_BANNER_APP_ID}, app-argument=${url}`,
+      `app-id=${IOS_APP_STORE_ID}, app-argument=${url}`,
     );
   }
 }
