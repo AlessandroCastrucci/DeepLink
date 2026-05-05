@@ -128,6 +128,62 @@ function storageKeyFull(key: string): string {
   return `app-banner:${key}`;
 }
 
+function buildResolverUrl(template: string, packageName: string, size = 192): string {
+  const hasPlaceholders = template.includes("{package}") || template.includes("{size}");
+  if (hasPlaceholders) {
+    return template
+      .replace(/\{package\}/g, encodeURIComponent(packageName))
+      .replace(/\{size\}/g, String(size));
+  }
+  const sep = template.includes("?") ? "&" : "?";
+  return `${template}${sep}package=${encodeURIComponent(packageName)}&size=${size}`;
+}
+
+const ICON_CACHE_TTL_MS = 7 * 86400000;
+
+function readCachedIcon(packageName: string): string | null {
+  try {
+    const raw = localStorage.getItem(`app-banner:icon:${packageName}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { url?: string; until?: number };
+    if (!parsed.url || !parsed.until || Date.now() > parsed.until) return null;
+    return parsed.url;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedIcon(packageName: string, url: string): void {
+  try {
+    localStorage.setItem(
+      `app-banner:icon:${packageName}`,
+      JSON.stringify({ url, until: Date.now() + ICON_CACHE_TTL_MS }),
+    );
+  } catch {
+    /* ignore quota */
+  }
+}
+
+async function resolveIconUrl(
+  resolverUrl: string,
+  packageName: string,
+): Promise<string | null> {
+  const cached = readCachedIcon(packageName);
+  if (cached) return cached;
+  try {
+    const res = await fetch(buildResolverUrl(resolverUrl, packageName), {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { iconUrl?: string };
+    if (!data.iconUrl) return null;
+    writeCachedIcon(packageName, data.iconUrl);
+    return data.iconUrl;
+  } catch {
+    return null;
+  }
+}
+
 function isDismissed(options: AppBannerOptions): boolean {
   try {
     const raw = localStorage.getItem(storageKeyFull(options.storageKey));
@@ -178,19 +234,38 @@ export function mountBanner(options: AppBannerOptions): () => void {
   const inner = document.createElement("div");
   inner.className = "app-banner-inner";
 
+  const iconImg = document.createElement("img");
+  iconImg.className = "app-banner-icon";
+  iconImg.alt = "";
+  iconImg.referrerPolicy = "no-referrer";
+
+  const iconPlaceholder = document.createElement("div");
+  iconPlaceholder.className = "app-banner-icon app-banner-icon--placeholder";
+  iconPlaceholder.textContent = options.title.trim().charAt(0).toUpperCase() || "A";
+
+  iconImg.addEventListener("error", () => {
+    if (iconImg.parentNode) iconImg.parentNode.replaceChild(iconPlaceholder, iconImg);
+  });
+
   let iconEl: HTMLImageElement | HTMLDivElement;
   if (options.iconUrl) {
-    const img = document.createElement("img");
-    img.className = "app-banner-icon";
-    img.alt = "";
-    img.src = options.iconUrl;
-    img.referrerPolicy = "no-referrer";
-    iconEl = img;
+    iconImg.src = options.iconUrl;
+    iconEl = iconImg;
+  } else if (options.iconResolverUrl) {
+    iconEl = iconPlaceholder;
+    resolveIconUrl(options.iconResolverUrl, options.packageName)
+      .then((resolved) => {
+        if (!resolved) return;
+        iconImg.src = resolved;
+        if (iconPlaceholder.parentNode) {
+          iconPlaceholder.parentNode.replaceChild(iconImg, iconPlaceholder);
+        }
+      })
+      .catch(() => {
+        /* keep placeholder */
+      });
   } else {
-    const ph = document.createElement("div");
-    ph.className = "app-banner-icon app-banner-icon--placeholder";
-    ph.textContent = options.title.trim().charAt(0).toUpperCase() || "A";
-    iconEl = ph;
+    iconEl = iconPlaceholder;
   }
 
   const text = document.createElement("div");

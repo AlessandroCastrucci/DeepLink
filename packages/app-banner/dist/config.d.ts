@@ -22,6 +22,12 @@ export type AppBannerOptions = {
     description: string;
     /** Optional square icon URL (png/webp). */
     iconUrl?: string;
+    /**
+     * Optional URL that returns `{ iconUrl: string }` JSON for the banner's `packageName`.
+     * Used only when `iconUrl` is not set. `{package}` and `{size}` placeholders are
+     * substituted in the URL; otherwise `?package=…&size=…` is appended.
+     */
+    iconResolverUrl?: string;
     /** Hide banner after dismiss for this many days (default 7). */
     dismissDays: number;
     /** If true (default), only render when the user agent looks like Android. */
