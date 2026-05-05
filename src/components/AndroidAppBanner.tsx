@@ -42,7 +42,7 @@ export default function AndroidAppBanner() {
         showAndroidOnly: true,
         theme: "dark",
         storageKey: "playvod-android-banner",
-        iconUrl: `${window.location.origin}/icons/icon-192.png`,
+        iconUrl: `${window.location.origin}/ChatGPT_Image_Feb_18,_2026,_04_06_07_PM.png`,
         openFallbackEnabled: true,
         openFallbackTimeoutMs: 3000,
         topInsetPx: HEADER_HEIGHT_PX,
