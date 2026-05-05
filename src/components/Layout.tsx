@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
 import StoreFooter from "./StoreFooter.tsx";
-import AppBanner from "./AppBanner.tsx";
+import AndroidAppBanner from "./AndroidAppBanner.tsx";
 import LoginModal from "./LoginModal.tsx";
 import {
   updateSmartBanner,
@@ -33,7 +33,7 @@ export default function Layout() {
   return (
     <div className="flex min-h-dvh flex-col">
       <Header />
-      <AppBanner />
+      <AndroidAppBanner />
       <main className="flex-1 pb-32">
         <Outlet />
       </main>
