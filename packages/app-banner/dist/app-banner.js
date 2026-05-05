@@ -1,8 +1,8 @@
-function N(e, n) {
+function T(e, n) {
   const c = `https://play.google.com/store/apps/details?id=${encodeURIComponent(e)}`;
   return n != null && n !== "" ? `${c}&referrer=${encodeURIComponent(n)}` : c;
 }
-function B(e) {
+function z(e) {
   const { deepLink: n, packageName: t, playStoreUrl: c } = e;
   let r;
   try {
@@ -17,10 +17,10 @@ function B(e) {
   return `intent://${o}#Intent;scheme=${d};package=${t};S.browser_fallback_url=${p};end`;
 }
 const C = "app-banner-styles";
-function I(e) {
+function $(e) {
   return e === "light" || e === "dark" ? e : typeof window > "u" || !window.matchMedia ? "light" : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function z() {
+function K() {
   if (typeof document > "u" || document.getElementById(C)) return;
   const e = document.createElement("style");
   e.id = C, e.textContent = `
@@ -131,7 +131,7 @@ function z() {
 }
 `, document.head.appendChild(e);
 }
-function A(e) {
+function N(e) {
   return `app-banner:${e}`;
 }
 function _(e, n, t = 192) {
@@ -140,8 +140,8 @@ function _(e, n, t = 192) {
   const r = e.includes("?") ? "&" : "?";
   return `${e}${r}package=${encodeURIComponent(n)}&size=${t}`;
 }
-const K = 7 * 864e5;
-function j(e) {
+const j = 7 * 864e5;
+function J(e) {
   try {
     const n = localStorage.getItem(`app-banner:icon:${e}`);
     if (!n) return null;
@@ -151,17 +151,17 @@ function j(e) {
     return null;
   }
 }
-function J(e, n) {
+function H(e, n) {
   try {
     localStorage.setItem(
       `app-banner:icon:${e}`,
-      JSON.stringify({ url: n, until: Date.now() + K })
+      JSON.stringify({ url: n, until: Date.now() + j })
     );
   } catch {
   }
 }
-async function H(e, n) {
-  const t = j(n);
+async function G(e, n) {
+  const t = J(n);
   if (t) return t;
   try {
     const c = await fetch(_(e, n), {
@@ -169,14 +169,21 @@ async function H(e, n) {
     });
     if (!c.ok) return null;
     const r = await c.json();
-    return r.iconUrl ? (J(n, r.iconUrl), r.iconUrl) : null;
+    return r.iconUrl ? (H(n, r.iconUrl), r.iconUrl) : null;
   } catch {
     return null;
   }
 }
-function G(e) {
+function V(e) {
+  if (D(e.dismissDuration) <= 0) {
+    try {
+      localStorage.removeItem(N(e.storageKey));
+    } catch {
+    }
+    return !1;
+  }
   try {
-    const n = localStorage.getItem(A(e.storageKey));
+    const n = localStorage.getItem(N(e.storageKey));
     if (!n) return !1;
     const t = JSON.parse(n);
     return !(!t.until || Date.now() > t.until);
@@ -184,40 +191,40 @@ function G(e) {
     return !1;
   }
 }
-const V = /^\s*(\d+(?:\.\d+)?)\s*(ms|s|m|h|d)?\s*$/i, Y = {
+const Y = /^\s*(\d+(?:\.\d+)?)\s*(ms|s|m|h|d)?\s*$/i, Q = {
   ms: 1,
   s: 1e3,
   m: 6e4,
   h: 36e5,
   d: 864e5
 };
-function Q(e) {
+function D(e) {
   if (e == null) return 0;
   if (typeof e == "number") return Number.isFinite(e) && e > 0 ? e : 0;
-  const n = V.exec(e);
+  const n = Y.exec(e);
   if (!n) return 0;
   const t = Number(n[1]);
   if (!Number.isFinite(t) || t <= 0) return 0;
   const c = (n[2] ?? "ms").toLowerCase();
-  return t * (Y[c] ?? 1);
+  return t * (Q[c] ?? 1);
 }
 function W(e) {
-  const n = Q(e.dismissDuration);
+  const n = D(e.dismissDuration);
   if (n <= 0) return;
   const t = Date.now() + n;
   try {
-    localStorage.setItem(A(e.storageKey), JSON.stringify({ until: t }));
+    localStorage.setItem(N(e.storageKey), JSON.stringify({ until: t }));
   } catch {
   }
 }
 function O(e) {
   var L;
-  z();
+  K();
   const n = document.createElement("div");
   n.className = "app-banner-host", n.setAttribute("role", "region"), n.setAttribute("aria-label", "App install banner");
   const t = e.topInsetPx ?? 0;
   t > 0 && (n.style.top = `${t}px`);
-  const r = I(e.theme) === "dark";
+  const r = $(e.theme) === "dark";
   n.style.setProperty("--app-banner-bg", r ? "var(--app-banner-bg-dark)" : "var(--app-banner-bg-light)"), n.style.setProperty("--app-banner-text", r ? "var(--app-banner-text-dark)" : "var(--app-banner-text-light)"), n.style.setProperty(
     "--app-banner-muted-text",
     r ? "var(--app-banner-muted-dark)" : "var(--app-banner-muted-light)"
@@ -234,7 +241,7 @@ function O(e) {
     o.parentNode && o.parentNode.replaceChild(p, o);
   });
   let k;
-  e.iconUrl ? (o.src = e.iconUrl, k = o) : e.iconResolverUrl ? (k = p, H(e.iconResolverUrl, e.packageName).then((a) => {
+  e.iconUrl ? (o.src = e.iconUrl, k = o) : e.iconResolverUrl ? (k = p, G(e.iconResolverUrl, e.packageName).then((a) => {
     a && (o.src = a, p.parentNode && p.parentNode.replaceChild(o, p));
   }).catch(() => {
   })) : k = p;
@@ -251,15 +258,15 @@ function O(e) {
   const m = document.createElement("button");
   m.type = "button", m.className = "app-banner-close", m.setAttribute("aria-label", "Dismiss"), m.innerHTML = "×";
   let g = 0, y = null;
-  function U() {
+  function S() {
     g !== 0 && (window.clearTimeout(g), g = 0), y && (document.removeEventListener("visibilitychange", y), y = null);
   }
-  function P() {
-    return e.playStoreUrl ?? N(e.packageName, e.playStoreReferrer);
+  function M() {
+    return e.playStoreUrl ?? T(e.packageName, e.playStoreReferrer);
   }
   h.addEventListener("click", () => {
-    U();
-    const a = P(), b = B({
+    S();
+    const a = M(), b = z({
       deepLink: e.deepLink,
       packageName: e.packageName,
       playStoreUrl: a
@@ -274,23 +281,23 @@ function O(e) {
       document.removeEventListener("visibilitychange", u), y = null, g = 0, f || window.location.assign(a);
     }, e.openFallbackTimeoutMs);
   });
-  const S = () => {
-    U(), n.remove();
+  const U = () => {
+    S(), n.remove();
     const a = document.documentElement, b = a.style.paddingTop;
     b && b.includes("px") && (a.style.paddingTop = "");
   };
   m.addEventListener("click", () => {
-    W(e), S();
+    W(e), U();
   }), E.append(h, m), d.append(k, x, E), n.append(d);
-  const M = () => n.getBoundingClientRect().height, T = () => {
-    const a = M();
+  const B = () => n.getBoundingClientRect().height, I = () => {
+    const a = B();
     document.documentElement.style.paddingTop = `${t + a}px`;
   };
-  document.body.appendChild(n), T();
-  const l = typeof ResizeObserver < "u" ? new ResizeObserver(() => T()) : null;
+  document.body.appendChild(n), I();
+  const l = typeof ResizeObserver < "u" ? new ResizeObserver(() => I()) : null;
   if (l == null || l.observe(n), e.theme === "auto" && window.matchMedia) {
     const a = window.matchMedia("(prefers-color-scheme: dark)"), b = () => {
-      const u = I("auto") === "dark";
+      const u = $("auto") === "dark";
       n.style.setProperty("--app-banner-bg", u ? "var(--app-banner-bg-dark)" : "var(--app-banner-bg-light)"), n.style.setProperty("--app-banner-text", u ? "var(--app-banner-text-dark)" : "var(--app-banner-text-light)"), n.style.setProperty(
         "--app-banner-muted-text",
         u ? "var(--app-banner-muted-dark)" : "var(--app-banner-muted-light)"
@@ -301,15 +308,15 @@ function O(e) {
     };
     return (L = a.addEventListener) == null || L.call(a, "change", b), () => {
       var f;
-      (f = a.removeEventListener) == null || f.call(a, "change", b), l == null || l.disconnect(), S();
+      (f = a.removeEventListener) == null || f.call(a, "change", b), l == null || l.disconnect(), U();
     };
   }
   return () => {
-    U(), l == null || l.disconnect(), S();
+    S(), l == null || l.disconnect(), U();
   };
 }
-function D(e) {
-  return !(e.showAndroidOnly && typeof navigator < "u" && !/Android/i.test(navigator.userAgent) || G(e));
+function P(e) {
+  return !(e.showAndroidOnly && typeof navigator < "u" && !/Android/i.test(navigator.userAgent) || V(e));
 }
 const i = {
   description: "Get the app for the best experience.",
@@ -320,10 +327,10 @@ const i = {
   openFallbackEnabled: !0,
   openFallbackTimeoutMs: 3e3
 };
-function $(e, n) {
+function F(e, n) {
   return e === void 0 || e === "" ? n : e === "1" || e.toLowerCase() === "true" || e.toLowerCase() === "yes";
 }
-function F(e, n) {
+function R(e, n) {
   if (e === void 0 || e === "") return n;
   const t = Number(e);
   return Number.isFinite(t) ? t : n;
@@ -335,28 +342,28 @@ function Z(e) {
   const n = e.dataset, t = n.package ?? "";
   if (!t)
     return console.warn("app-banner: missing data-package on script tag"), null;
-  const c = n.deepLink ?? (typeof window < "u" ? window.location.href : "https://localhost/"), r = n.title ?? "App", d = n.playStoreUrl, o = n.playReferrer, p = d ?? N(t, o);
+  const c = n.deepLink ?? (typeof window < "u" ? window.location.href : "https://localhost/"), r = n.title ?? "App", d = n.playStoreUrl, o = n.playReferrer, p = d ?? T(t, o);
   return {
     packageName: t,
     deepLink: c,
     playStoreUrl: p,
     playStoreReferrer: o,
-    openFallbackEnabled: $(n.openFallbackEnabled, i.openFallbackEnabled),
-    openFallbackTimeoutMs: F(n.openFallbackTimeoutMs, i.openFallbackTimeoutMs),
+    openFallbackEnabled: F(n.openFallbackEnabled, i.openFallbackEnabled),
+    openFallbackTimeoutMs: R(n.openFallbackTimeoutMs, i.openFallbackTimeoutMs),
     title: r,
     description: n.description ?? i.description,
     iconUrl: n.icon,
     iconResolverUrl: n.iconResolver,
     dismissDuration: n.dismissDuration ?? n.dismissDays ?? i.dismissDuration,
-    showAndroidOnly: $(n.showAndroidOnly, i.showAndroidOnly),
+    showAndroidOnly: F(n.showAndroidOnly, i.showAndroidOnly),
     openButtonText: n.openButtonText ?? i.openButtonText,
     theme: X(n.theme),
     storageKey: n.storageKey ?? t,
-    topInsetPx: F(n.topInset, 0) || void 0
+    topInsetPx: R(n.topInset, 0) || void 0
   };
 }
 function ee(e) {
-  const n = e.playStoreUrl ?? N(e.packageName, e.playStoreReferrer);
+  const n = e.playStoreUrl ?? T(e.packageName, e.playStoreReferrer);
   return {
     packageName: e.packageName,
     deepLink: e.deepLink,
@@ -378,7 +385,7 @@ function ee(e) {
 }
 let s;
 function ne(e) {
-  return s == null || s(), D(e) ? (s = O(e), () => {
+  return s == null || s(), P(e) ? (s = O(e), () => {
     s == null || s(), s = void 0;
   }) : (s = void 0, () => {
   });
@@ -390,16 +397,16 @@ function q() {
   const n = document.querySelectorAll("script[data-app-banner]");
   return n.length ? n[n.length - 1] : null;
 }
-function R() {
+function A() {
   const e = q();
   if (!e) return;
   const n = Z(e);
-  n && D(n) && (s == null || s(), s = O(n));
+  n && P(n) && (s == null || s(), s = O(n));
 }
-typeof window < "u" && (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => R(), { once: !0 }) : queueMicrotask(() => R()));
+typeof window < "u" && (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => A(), { once: !0 }) : queueMicrotask(() => A()));
 export {
-  B as buildIntentUri,
-  N as buildPlayStoreUrl,
+  z as buildIntentUri,
+  T as buildPlayStoreUrl,
   ee as createBannerOptions,
   ne as mountAppBanner
 };

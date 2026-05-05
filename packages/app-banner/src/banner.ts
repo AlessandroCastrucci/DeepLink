@@ -185,6 +185,14 @@ async function resolveIconUrl(
 }
 
 function isDismissed(options: AppBannerOptions): boolean {
+  if (parseDurationMs(options.dismissDuration) <= 0) {
+    try {
+      localStorage.removeItem(storageKeyFull(options.storageKey));
+    } catch {
+      /* ignore */
+    }
+    return false;
+  }
   try {
     const raw = localStorage.getItem(storageKeyFull(options.storageKey));
     if (!raw) return false;
