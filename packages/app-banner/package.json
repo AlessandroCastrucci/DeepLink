@@ -1,0 +1,37 @@
+{
+  "name": "app-banner",
+  "version": "0.1.0",
+  "description": "Lightweight smart-app-style banner for Android web → native app deep links",
+  "type": "module",
+  "main": "./dist/app-banner.umd.cjs",
+  "module": "./dist/app-banner.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/app-banner.js",
+      "require": "./dist/app-banner.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "dev": "vite build --watch",
+    "demo": "npm run build && npx --yes serve . -l 4173"
+  },
+  "keywords": [
+    "android",
+    "smart-banner",
+    "deep-link",
+    "play-store",
+    "intent"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  }
+}

@@ -17,6 +17,8 @@ npm run build
 
 This creates a `dist/` folder containing the static files ready for deployment.
 
+The Android app-open banner uses a **vendored copy** of the SDK in **`packages/app-banner/`** (see `packages/README.md`). It is linked from `package.json` as `"app-banner": "file:./packages/app-banner"` so **no external monorepo path** is required on remote servers. **`packages/app-banner/dist/` is tracked in git** so builds work even when CI runs `npm ci --ignore-scripts`; after changing SDK sources, run `npm run build` inside `packages/app-banner/` and commit the updated `dist/` files.
+
 ## Deployment
 
 You can deploy this website with or without the build process. Simply upload the following files to any web server:

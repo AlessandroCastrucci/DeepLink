@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>app-banner local demo</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 1rem;
+        max-width: 52rem;
+        line-height: 1.55;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 2rem 0 0.75rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.25rem;
+      }
+      code {
+        background: #f0f0f0;
+        padding: 0.15em 0.35em;
+        border-radius: 4px;
+        font-size: 0.92em;
+      }
+      pre {
+        background: #f6f8fa;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.45;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      ul {
+        padding-left: 1.25rem;
+      }
+      li {
+        margin: 0.35em 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        text-align: left;
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 0.65rem;
+        vertical-align: top;
+      }
+      th {
+        background: #f9fafb;
+        white-space: nowrap;
+      }
+      .muted {
+        color: #555;
+        font-size: 0.95rem;
+      }
+    </style>
+    <!-- From repo root: npm run demo → http://localhost:4173/demo/ -->
+    <script
+      src="../dist/app-banner.umd.cjs"
+      data-app-banner
+      data-package="com.example.app"
+      data-title="Example app"
+      data-description="Open in the native app (intent → Play Store fallback)."
+      data-play-referrer="utm_source=demo&amp;utm_medium=web"
+      data-dismiss-days="1"
+      data-storage-key="demo-local"
+      data-show-android-only="false"
+      async
+    ></script>
+  </head>
+  <body>
+    <h1>app-banner demo</h1>
+    <p class="muted">
+      The banner is injected above this page. This demo uses
+      <code>data-show-android-only=&quot;false&quot;</code> so you can preview it on desktop; in production
+      you usually omit that so only Android users see it.
+    </p>
+
+    <h2>How to use the banner</h2>
+    <p>
+      Host <code>dist/app-banner.umd.cjs</code> on your site or CDN, then add a single script tag on any
+      page that should offer “open in app.” The tag must include <code>data-app-banner</code> (marker) and
+      <code>data-package</code> (your Google Play application id). Other options are optional
+      <code>data-*</code> attributes.
+    </p>
+    <pre><code>&lt;script
+  src="/path/to/app-banner.umd.cjs"
+  data-app-banner
+  data-package="com.example.app"
+  data-title="Example"
+  data-description="Get the app for the best experience."
+  async
+&gt;&lt;/script&gt;</code></pre>
+    <p>
+      Run this project locally: from the repo root run <code>npm run demo</code> and open
+      <code>http://localhost:4173/demo/</code>. On a phone on the same Wi‑Fi, use your machine’s LAN IP
+      instead of <code>localhost</code> to test real Android intent behavior.
+    </p>
+
+    <h2>Configuration (<code>data-*</code>)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Required</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>data-app-banner</code></td>
+          <td>yes</td>
+          <td>Identifies the loader script (value may be empty). Required so async scripts can be found.</td>
+        </tr>
+        <tr>
+          <td><code>data-package</code></td>
+          <td>yes</td>
+          <td>Play Store package name (<code>applicationId</code>). Used in the intent and default store URL.</td>
+        </tr>
+        <tr>
+          <td><code>data-title</code></td>
+          <td>no</td>
+          <td>Banner title. Default <code>App</code>.</td>
+        </tr>
+        <tr>
+          <td><code>data-description</code></td>
+          <td>no</td>
+          <td>Subtitle under the title.</td>
+        </tr>
+        <tr>
+          <td><code>data-deep-link</code></td>
+          <td>no</td>
+          <td>
+            Full URL passed into the Android intent. Defaults to the <strong>current page URL</strong> when the
+            script initializes (same origin/path/query/hash as this page unless you override).
+          </td>
+        </tr>
+        <tr>
+          <td><code>data-icon</code></td>
+          <td>no</td>
+          <td>Square image URL for the icon.</td>
+        </tr>
+        <tr>
+          <td><code>data-play-store-url</code></td>
+          <td>no</td>
+          <td>
+            Overrides the fallback store URL entirely. If set, <code>data-play-referrer</code> is not merged in;
+            put any query string you need in this URL.
+          </td>
+        </tr>
+        <tr>
+          <td><code>data-play-referrer</code></td>
+          <td>no</td>
+          <td>
+            Install attribution string appended as <code>&amp;referrer=</code> on the <strong>default</strong> Play
+            URL (not used when <code>data-play-store-url</code> is set). Example: <code>utm_source=webapp</code>
+            or key=value pairs.
+          </td>
+        </tr>
+        <tr>
+          <td><code>data-open-fallback-enabled</code></td>
+          <td>no</td>
+          <td>
+            <code>true</code> / <code>false</code> (default <code>true</code>). After <strong>Open</strong>, if the
+            page never becomes hidden (user did not switch to another app), redirect to the Play URL after the
+            timeout—covers cases where the intent path does not leave the browser.
+          </td>
+        </tr>
+        <tr>
+          <td><code>data-open-fallback-timeout-ms</code></td>
+          <td>no</td>
+          <td>Milliseconds to wait before that redirect (default <code>3000</code>). Use <code>0</code> to disable the timer.</td>
+        </tr>
+        <tr>
+          <td><code>data-dismiss-days</code></td>
+          <td>no</td>
+          <td>After the user dismisses the banner, hide it for this many days (default <code>7</code>).</td>
+        </tr>
+        <tr>
+          <td><code>data-show-android-only</code></td>
+          <td>no</td>
+          <td><code>true</code> / <code>false</code>. Default <code>true</code> (only show when UA looks like Android).</td>
+        </tr>
+        <tr>
+          <td><code>data-open-button-text</code></td>
+          <td>no</td>
+          <td>Label on the primary button (default <code>Open</code>).</td>
+        </tr>
+        <tr>
+          <td><code>data-theme</code></td>
+          <td>no</td>
+          <td><code>light</code>, <code>dark</code>, or <code>auto</code> (follows system).</td>
+        </tr>
+        <tr>
+          <td><code>data-storage-key</code></td>
+          <td>no</td>
+          <td>Suffix for <code>localStorage</code> dismiss state; default is the package name.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Deep links and what happens when the user taps Open</h2>
+    <p>
+      On <strong>Android Chrome</strong> (and other browsers that support Android intent URLs), tapping
+      <strong>Open</strong> navigates to a single <strong>Chrome intent URL</strong>. That intent tells the
+      system to open your app for a given deep link, using your <code>data-package</code>, and if the app is
+      not installed, to open the Play Store instead.
+    </p>
+    <p>The banner builds this shape (see Chrome’s <em>Android intents</em> documentation):</p>
+    <pre><code>intent://&lt;host path query hash&gt;#Intent;
+  scheme=&lt;deep link scheme&gt;;
+  package=&lt;data-package&gt;;
+  S.browser_fallback_url=&lt;encoded Play Store URL&gt;;
+end</code></pre>
+    <ul>
+      <li>
+        <strong>Deep link input</strong> comes from <code>data-deep-link</code>, or defaults to the current
+        page URL. It must be a valid absolute URL with a scheme (e.g. <code>https://</code>,
+        <code>http://</code>, or a custom scheme like <code>myapp://…</code>).
+      </li>
+      <li>
+        The SDK parses that URL and sets <code>scheme=</code> to its protocol (without the colon), so
+        <strong>HTTPS App Links</strong> use <code>scheme=https</code>; a custom scheme uses your app’s
+        scheme name.
+      </li>
+      <li>
+        The <code>intent://…</code> host/path segment mirrors the deep link’s host, path, query string, and
+        hash so the same resource path can open in the native app when links are verified (Digital Asset Links /
+        intent filters).
+      </li>
+      <li>
+        <strong>Intent fallback URL:</strong> <code>S.browser_fallback_url</code> is the resolved Play Store URL
+        (default <code>details?id=&lt;package&gt;</code> plus optional <code>data-play-referrer</code> as
+        <code>&amp;referrer=</code>, or a full <code>data-play-store-url</code> override).
+      </li>
+      <li>
+        <strong>Visibility + timeout fallback:</strong> after <strong>Open</strong>, the SDK listens for
+        <code>visibilitychange</code>. If the document stays visible for
+        <code>data-open-fallback-timeout-ms</code> (default 3s), it navigates to the same Play URL—useful when the
+        intent does not hand off to the app. Set <code>data-open-fallback-enabled=&quot;false&quot;</code> or
+        timeout <code>0</code> to turn this off.
+      </li>
+    </ul>
+    <p class="muted">
+      <strong>Not guaranteed on every environment:</strong> in-app browsers, desktop Safari/Chrome, or OS versions
+      may ignore intents or open the store in a tab instead of the Play app. Test on real Android devices with
+      your real package id and verified deep links.
+    </p>
+  </body>
+</html>
